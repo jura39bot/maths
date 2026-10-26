@@ -398,41 +398,40 @@ function frNum(n){
   if(r)parts.push(b1000(r));
   return parts.join(" ");
 }
-function convPanel(mm,to,answer){
-  const cols=[
-    {k:"km",i:0},{k:"hm",i:1},{k:"dam",i:2},{k:"m",i:3},
-    {k:"dm",i:4},{k:"cm",i:5},{k:"mm",i:6}
-  ];
-  const startIdx=3; // colonne des mètres
-  const targetIdx={m:3,dm:4,cm:5,mm:6}[to]!==undefined?{m:3,dm:4,cm:5,mm:6}[to]:6;
+function convPanel(th,to,answer,fam){
+  fam=fam||"m";
+  const T={
+    m:{cols:["km","hm","dam","m","dm","cm","mm"],
+       leg:"km kilomètre · hm hectomètre · dam décamètre · m mètre · dm décimètre · cm centimètre · mm millimètre"},
+    L:{cols:["kL","hL","daL","L","dL","cL","mL"],
+       leg:"kL kilolitre · hL hectolitre · daL décalitre · L litre · dL décilitre · cL centilitre · mL millilitre"},
+    g:{cols:["kg","hg","dag","g","dg","cg","mg"],
+       leg:"kg kilogramme · hg hectogramme · dag décagramme · g gramme · dg décigramme · cg centigramme · mg milligramme"}
+  }[fam];
 
-  // valeur de départ en mm, écrite à sa place (virgule dans la colonne des m)
-  const srcDigits=String(Math.round(mm));
-  const src={};
-  for(let i=0;i<srcDigits.length;i++){
-    const idx=startIdx-i;
-    if(idx>=0) src[cols[idx].k]=srcDigits[srcDigits.length-1-i];
-  }
+  const base={m:"m",L:"L",g:"g"}[fam];
+  const targetIdx={};
+  T.cols.forEach((c,i)=>{ if(c===to) targetIdx[c]=i; });
+  const tIdx=targetIdx[to]!==undefined?targetIdx[to]:6;
 
-  // réponse, alignée à droite sur la colonne visée
   const ansDigits=String(answer);
   const ans={};
   for(let i=0;i<ansDigits.length;i++){
-    const idx=targetIdx-i;
-    if(idx>=0) ans[cols[idx].k]=ansDigits[ansDigits.length-1-i];
+    const idx=tIdx-i;
+    if(idx>=0) ans[T.cols[idx]]=ansDigits[ansDigits.length-1-i];
   }
 
-  const cells=cols.map(c=>{
-    const d=ans[c.k]!==undefined?ans[c.k]:"·";
-    const hi=ans[c.k]!==undefined?" hi":"";
-    return `<div class="place${hi}"><b>${d}</b><span>${c.k}</span></div>`;
+  const cells=T.cols.map(c=>{
+    const d=ans[c]!==undefined?ans[c]:"·";
+    const hi=ans[c]!==undefined?" hi":"";
+    return `<div class="place${hi}"><b>${d}</b><span>${c}</span></div>`;
   }).join("");
 
-  const srcTxt=String(mm/1000).replace(".",",");
+  const srcTxt=String(th/1000).replace(".",",");
 
   return `<div class="places">${cells}</div>
-    <div class="legend">km kilomètre · hm hectomètre · dam décamètre · m mètre · dm décimètre · cm centimètre · mm millimètre</div>
-    <div class="tiny muted" style="text-align:center;margin-top:8px">${srcTxt} m → on remplit jusqu'à <b>${to}</b> : ${answer} ${to}<br>chaque colonne franchie = ×10</div>`;
+    <div class="legend">${T.leg}</div>
+    <div class="tiny muted" style="text-align:center;margin-top:8px">${srcTxt} ${base} → on remplit jusqu'à <b>${to}</b> : ${answer} ${to}<br>chaque colonne franchie = ×10</div>`;
 }
 
 function placesPanel(numStr){
@@ -509,14 +508,17 @@ CM2:[
    {h:"Tableau des longueurs",p:"km kilomètre · hm hectomètre · dam décamètre · m mètre · dm décimètre · cm centimètre · mm millimètre. Chaque colonne vaut 10 fois celle de droite."},
    {h:"Le décalage",p:"m → cm : 2 colonnes vers la droite, donc × 100. m → mm : 3 colonnes, donc × 1 000."},
    {h:"Exemple",p:"4,2 m = 42 dm = 420 cm = 4 200 mm. On ajoute un zéro par colonne franchie."},
-   {h:"Masses",p:"1 kg = 1 000 g · 1 g = 1 000 mg"},
-   {h:"Capacités",p:"1 L = 1 000 mL · 1 L = 1 dm³"}],
+   {h:"Tableau des masses",p:"kg kilogramme · hg hectogramme · dag décagramme · g gramme · dg décigramme · cg centigramme · mg milligramme. Même principe : 1 kg = 1 000 g."},
+   {h:"Tableau des capacités",p:"kL kilolitre · hL hectolitre · daL décalitre · L litre · dL décilitre · cL centilitre · mL millilitre. 1 L = 1 000 mL = 1 dm³."}],
   gen(){
-    const mm=pick([1500,2500,3500,4200,6800,1200,3400,7500]);
-    const to=pick(["cm","mm"]);
-    const v=mm/1000;
+    const fam=pick(["m","L","g"]);
+    const sub={m:["cm","mm"],L:["cL","mL"],g:["cg","mg"]}[fam];
+    const to=pick(sub);
+    const v=pick([1.5,2.5,3.5,4.2,6.8,1.2,3.4,7.5]);
+    const th=Math.round(v*1000);
+    const ans=to===sub[0]?th/10:th;
     const shown=String(v).replace(".",",");
-    return {q:`${shown} m = ? ${to}`,a:String(to==="cm"?mm/10:mm),unit:to,conv:{mm,to}};
+    return {q:`${shown} ${fam} = ? ${to}`,a:String(ans),unit:to,conv:{th,to,fam}};
   }}
 ],
 "6E":[
@@ -850,7 +852,7 @@ function quiz(a){
     $("#nx").disabled=false;
     const fb=document.createElement("div");
     fb.className="fb "+(ok?"ok":"no");
-    const panel=q.places?placesPanel(q.a):(q.conv?convPanel(q.conv.mm,q.conv.to,q.a):"");
+    const panel=q.places?placesPanel(q.a):(q.conv?convPanel(q.conv.th,q.conv.to,q.a,q.conv.fam):"");
     const rep=esc(q.a)+(q.unit?" "+q.unit:"");
     fb.innerHTML=ok?("✓ Juste — <b>"+rep+"</b>"+panel)
                    :((q.speak?"✗ Faux. Le nombre était <b>":"✗ Faux. La bonne réponse est <b>")+rep+"</b>"+panel);
@@ -999,7 +1001,7 @@ function profile(a){
     <input id="fi" type="file" accept="application/json" style="display:none">
     <div style="height:10px"></div>
     <button class="btn alt" id="rst" style="color:#ff9a9a">♻️ Réinitialiser</button></div>
-  <p class="tiny muted" style="text-align:center;margin-top:16px">v8 · 26/10 22:12 · données sur ton téléphone</p>`;
+  <p class="tiny muted" style="text-align:center;margin-top:16px">v9 · 26/10 22:14 · données sur ton téléphone</p>`;
   a.querySelectorAll("[data-l]").forEach(b=>b.onclick=()=>{p.level=b.dataset.l;save();toast("Niveau : "+LEVELS[b.dataset.l].n);render()});
   $("#ren").onclick=()=>{const v=prompt("Ton prénom",p.name);if(v&&v.trim()){p.name=v.trim().slice(0,18);save();render()}};
   $("#sy").onclick=()=>{const v=$("#tk").value.trim();if(v&&v.indexOf("•")!==0)localStorage.setItem(TOKKEY,v);ghSync()};
