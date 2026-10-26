@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Maths — CM2 à 3e</title>
+<meta name="theme-color" content="#0b1220">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Maths">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icons/icon-180.png">
+<style>
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+:root{--bg:#0b1220;--card:#151f31;--card2:#1c2942;--line:#24334d;--txt:#eef3fb;--dim:#93a4bf;
+--acc:#58cc02;--acc2:#1cb0f6;--warn:#ff9600;--bad:#ff4b4b;--pink:#ff4b8b;--r:18px}
+html,body{margin:0;height:100%}
+body{background:radial-gradient(1200px 600px at 50% -10%,#1a2b45 0%,var(--bg) 55%) fixed;color:var(--txt);
+font:16px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+overscroll-behavior-y:contain}
+#app{max-width:520px;margin:0 auto;padding:16px 16px 96px;min-height:100vh}
+h1,h2,h3{margin:0;line-height:1.2}
+h1{font-size:24px;letter-spacing:-.5px}
+h2{font-size:19px}
+h3{font-size:15px;color:var(--dim);font-weight:600;text-transform:uppercase;letter-spacing:.08em}
+p{margin:0}.muted{color:var(--dim)}.small{font-size:13px}.tiny{font-size:11px}
+.row{display:flex;align-items:center;gap:10px}
+.between{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:16px}
+.stack>*+*{margin-top:12px}
+.spacer{height:12px}
+button{font:inherit;color:inherit;border:0;background:none;cursor:pointer}
+.btn{display:block;width:100%;padding:16px;border-radius:16px;background:var(--acc);color:#06210a;
+font-weight:800;font-size:16px;text-align:center;box-shadow:0 4px 0 #3d8f01;transition:transform .06s,box-shadow .06s}
+.btn:active{transform:translateY(3px);box-shadow:0 1px 0 #3d8f01}
+.btn.alt{background:var(--card2);color:var(--txt);box-shadow:0 4px 0 #0d1524;border:1px solid var(--line)}
+.btn.blue{background:var(--acc2);color:#04212f;box-shadow:0 4px 0 #0d739f}
+.btn:disabled{opacity:.45;box-shadow:none;transform:none}
+.pill{display:inline-flex;align-items:center;gap:6px;background:var(--card2);border:1px solid var(--line);
+padding:6px 12px;border-radius:999px;font-size:13px;font-weight:700}
+.bar{height:10px;border-radius:99px;background:#0e1727;overflow:hidden;border:1px solid var(--line)}
+.bar>i{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,var(--acc),#8ee000);transition:width .4s}
+.ring{--p:0;width:76px;height:76px;border-radius:50%;flex:0 0 auto;
+background:conic-gradient(var(--acc) calc(var(--p)*1%),#0e1727 0);display:grid;place-items:center;position:relative}
+.ring::after{content:"";position:absolute;inset:7px;border-radius:50%;background:var(--card)}
+.ring span{position:relative;z-index:1;font-weight:800;font-size:17px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px;text-align:center}
+.stat b{display:block;font-size:20px;line-height:1.2}
+.stat i{font-style:normal;font-size:11px;color:var(--dim);text-transform:uppercase;letter-spacing:.06em}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.lvl{display:flex;align-items:center;gap:14px;background:var(--card);border:1px solid var(--line);
+border-radius:var(--r);padding:14px;width:100%;text-align:left;transition:transform .08s}
+.lvl:active{transform:scale(.985)}
+.lvl .ico{width:46px;height:46px;border-radius:14px;display:grid;place-items:center;font-size:20px;font-weight:800;flex:0 0 auto}
+.lvl .meta{flex:1;min-width:0}.lvl .meta b{font-size:16px}.lvl .meta .bar{margin-top:8px}
+.cardq{background:var(--card2);border:1px solid var(--line);border-radius:16px;padding:14px}
+.choice{display:block;width:100%;text-align:left;padding:15px 16px;border-radius:14px;background:var(--card);
+border:1.5px solid var(--line);margin-top:10px;font-weight:600;font-size:15px;transition:transform .06s}
+.choice:active{transform:scale(.99)}
+.choice.ok{border-color:var(--acc);background:#12250c}
+.choice.no{border-color:var(--bad);background:#2a1113}
+.choice .k{display:inline-block;min-width:22px;color:var(--dim);font-weight:800}
+.top{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.back{width:38px;height:38px;border-radius:12px;background:var(--card);border:1px solid var(--line);
+display:grid;place-items:center;font-size:18px}
+.bigq{font-size:26px;font-weight:800;letter-spacing:-.5px;margin:4px 0}
+.ex{color:var(--dim);font-size:14px;font-style:italic;margin-top:10px;border-left:3px solid var(--line);padding-left:10px}
+input[type=text]{width:100%;padding:15px;border-radius:14px;border:1.5px solid var(--line);
+background:#0e1727;color:var(--txt);font-size:20px;outline:none;text-align:center;font-weight:700}
+input[type=text]:focus{border-color:var(--acc2)}
+.feed{position:fixed;left:0;right:0;bottom:0;padding:14px 16px calc(14px + env(safe-area-inset-bottom));
+background:linear-gradient(180deg,rgba(11,18,32,0),rgba(11,18,32,.96) 30%);z-index:9}
+.feed>div{max-width:520px;margin:0 auto}
+.toast{position:fixed;left:50%;bottom:110px;transform:translateX(-50%) translateY(20px);opacity:0;
+background:#0f2b12;border:1px solid #2f7a1a;color:#d7ffc4;padding:12px 18px;border-radius:14px;
+font-weight:700;font-size:14px;transition:.25s;z-index:20;pointer-events:none;max-width:90vw;text-align:center}
+.toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
+.bars{display:flex;align-items:flex-end;gap:8px;height:90px}
+.bars>div{flex:1;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:6px;height:100%}
+.bars i{display:block;width:100%;border-radius:6px 6px 0 0;background:linear-gradient(180deg,var(--acc),#2e8b01);min-height:4px}
+.bars span{font-size:10px;color:var(--dim)}
+.avs{display:grid;grid-template-columns:repeat(6,1fr);gap:8px}
+.avs button{font-size:26px;padding:8px;border-radius:12px;background:var(--card2);border:1.5px solid var(--line)}
+.avs button.sel{border-color:var(--acc);background:#12250c}
+.tabs{display:flex;gap:8px;margin-bottom:14px}
+.tab{flex:1;padding:11px;border-radius:12px;background:var(--card);border:1px solid var(--line);font-weight:700;font-size:14px;text-align:center}
+.tab.on{background:var(--acc);color:#06210a;border-color:var(--acc)}
+.formula{background:#0e1727;border:1px solid var(--line);border-radius:12px;padding:10px 12px;
+font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:15px;color:#9fe870;margin-top:6px}
+.corr{color:#9fe870;font-weight:700}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<div class="toast" id="toast"></div>
+<script>
+const KEY="maths_v1";
+const LEVELS={
+  CM2:{n:"CM2",sub:"10-11 ans",emoji:"🧩",c:"#58cc02"},
+  "6E":{n:"6e",sub:"11-12 ans",emoji:"📐",c:"#1cb0f6"},
+  "5E":{n:"5e",sub:"12-13 ans",emoji:"📊",c:"#ce82ff"},
+  "4E":{n:"4e",sub:"13-14 ans",emoji:"🔺",c:"#ff9600"},
+  "3E":{n:"3e",sub:"14-15 ans",emoji:"🎯",c:"#ff4b8b"}
+};
+const AVATARS=["🦊","🐼","🦉","🐙","🦁","🐸","🐧","🦄","🐺","🐨"];
+const GOAL_XP=50;
+
+/* ---------- utils ---------- */
+const $=s=>document.querySelector(s);
+const rnd=(a,b)=>a+Math.floor(Math.random()*(b-a+1));
+const pick=a=>a[Math.floor(Math.random()*a.length)];
+const gcd=(a,b)=>b?gcd(b,a%b):a;
+function esc(s){return String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]))}
+function el(h){const d=document.createElement("div");d.innerHTML=h.trim();return d.firstElementChild}
+function toast(m){const t=$("#toast");t.textContent=m;t.classList.add("on");clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove("on"),1800)}
+const today=()=>new Date().toISOString().slice(0,10);
+function num(v){const s=String(v).replace(/\s/g,"").replace(",",".").replace(/^\+/,"");const n=parseFloat(s);return isNaN(n)?null:n}
+
+/* ---------- content ---------- */
+const M={
+CM2:[
+ {id:"cm2_calc",t:"Calcul mental",lecon:[
+   {h:"Multiplier",p:"On pose la multiplication et on additionne les résultats partiels."},
+   {h:"Astuce",p:"Pour ×9 : multiplie par 10 puis enlève le nombre. 7×9 = 70−7 = 63."},
+   {h:"Priorités",p:"D'abord les parenthèses, puis × et ÷, enfin + et −."}],
+  gen(){const a=rnd(12,29),b=rnd(3,9);return{q:`${a} × ${b}`,a:String(a*b)}}},
+ {id:"cm2_frac",t:"Fractions",lecon:[
+   {h:"Même dénominateur",p:"On additionne les numérateurs, le dénominateur ne change pas."},
+   {h:"Formule",p:"a/d + b/d = (a+b)/d"}],
+  gen(){const d=pick([3,4,5,6,8]);let a=rnd(1,d-2),b=rnd(1,d-a-1);
+   const good=`${a+b}/${d}`;const o=[good,`${a+b}/${d*2}`,`${a*b}/${d}`,`${a+b+1}/${d}`];
+   return{q:`${a}/${d} + ${b}/${d} = ?`,a:good,opts:shuffle([...new Set(o)]).slice(0,4)}}},
+ {id:"cm2_dec",t:"Nombres décimaux",lecon:[
+   {h:"Addition",p:"On aligne les virgules avant de calculer."},
+   {h:"Multiplication par 10",p:"La virgule se décale d'un rang vers la droite."}],
+  gen(){const a=rnd(15,95)/10,b=rnd(15,95)/10;return{q:`${a.toFixed(1)} + ${b.toFixed(1)}`,a:(a+b).toFixed(1)}}},
+ {id:"cm2_prop",t:"Proportionnalité",lecon:[
+   {h:"Prix unitaire",p:"On divise le prix total par la quantité pour avoir le prix d'un objet."},
+   {h:"Formule",p:"prix = prix unitaire × quantité"}],
+  gen(){const u=rnd(2,9),n1=rnd(2,6),n2=rnd(2,9);
+   return{q:`${n1} stylos coûtent ${u*n1} €. Combien coûtent ${n2} stylos ?`,a:String(u*n2),unit:"€"}}},
+ {id:"cm2_geo",t:"Périmètres et aires",lecon:[
+   {h:"Rectangle — périmètre",p:"P = 2 × (L + l)"},
+   {h:"Rectangle — aire",p:"A = L × l, en cm²"},
+   {h:"Carré",p:"P = 4 × c et A = c × c"}],
+  gen(){const L=rnd(4,15),l=rnd(2,L-1);
+   if(Math.random()<.5)return{q:`Périmètre d'un rectangle de ${L} cm sur ${l} cm`,a:String(2*(L+l)),unit:"cm"};
+   return{q:`Aire d'un rectangle de ${L} cm sur ${l} cm`,a:String(L*l),unit:"cm²"}}},
+ {id:"cm2_conv",t:"Conversions",lecon:[
+   {h:"Longueurs",p:"1 m = 100 cm · 1 km = 1000 m"},
+   {h:"Masses",p:"1 kg = 1000 g"},
+   {h:"Capacités",p:"1 L = 1000 mL"}],
+  gen(){const v=pick([1.5,2.5,3.5,4.2,6.8]);const to=pick(["cm","mm"]);
+   const f=to==="cm"?100:1000;
+   return{q:`${v} m = ? ${to}`,a:String(Math.round(v*f)),unit:to}}}
+],
+"6E":[
+ {id:"6e_frac",t:"Simplifier une fraction",lecon:[
+   {h:"Principe",p:"On divise le numérateur et le dénominateur par le même nombre."},
+   {h:"Jusqu'au bout",p:"On s'arrête quand ils n'ont plus de diviseur commun."}],
+  gen(){const g=rnd(2,6),a=rnd(2,7),b=rnd(a+1,11);const n=a*g,d=b*g;
+   return{q:`Simplifie ${n}/${d}`,a:`${a}/${b}`,opts:shuffle([`${a}/${b}`,`${a+1}/${b}`,`${a}/${b+1}`,`${n}/${d}`]).slice(0,4)}}},
+ {id:"6e_dec",t:"Décimaux",lecon:[
+   {h:"Comparer",p:"On compare d'abord la partie entière, puis les dixièmes, etc."},
+   {h:"× 10 / × 100",p:"La virgule se décale de 1 ou 2 rangs."}],
+  gen(){const a=rnd(12,98)/10,k=pick([10,100]);return{q:`${a.toFixed(1)} × ${k}`,a:String(Math.round(a*k*10)/10)}}},
+ {id:"6e_prop",t:"Tableau de proportionnalité",lecon:[
+   {h:"Passage à l'unité",p:"On divise par la première quantité, puis on multiplie par la seconde."},
+   {h:"Produit en croix",p:"a/b = c/d  →  a × d = b × c"}],
+  gen(){const u=rnd(3,12),n1=rnd(2,6),n2=rnd(2,9);
+   return{q:`${n1} → ${u*n1}\n${n2} → ?`,a:String(u*n2)}}},
+ {id:"6e_ang",t:"Angles",lecon:[
+   {h:"Complémentaires",p:"Deux angles dont la somme fait 90°."},
+   {h:"Supplémentaires",p:"Deux angles dont la somme fait 180°."}],
+  gen(){const x=rnd(15,75);const sup=Math.random()<.5;
+   return{q:`Quel est ${sup?"le supplémentaire":"le complémentaire"} de ${x}° ?`,a:String(sup?180-x:90-x),unit:"°"}}},
+ {id:"6e_air",t:"Aire du triangle",lecon:[
+   {h:"Formule",p:"A = (base × hauteur) ÷ 2"},
+   {h:"Attention",p:"La hauteur est perpendiculaire à la base."}],
+  gen(){const b=pick([4,6,8,10,12]),h=pick([3,5,7,9]);
+   return{q:`Aire d'un triangle : base ${b} cm, hauteur ${h} cm`,a:String(b*h/2),unit:"cm²"}}},
+ {id:"6e_div",t:"Diviseurs et PGCD",lecon:[
+   {h:"Diviseur",p:"Un nombre qui divise sans reste."},
+   {h:"PGCD",p:"Le plus grand diviseur commun à deux nombres."}],
+  gen(){const g=rnd(2,6),a=g*rnd(2,5),b=g*rnd(6,9);return{q:`PGCD de ${a} et ${b}`,a:String(g)}}}
+],
+"5E":[
+ {id:"5e_rel",t:"Nombres relatifs",lecon:[
+   {h:"Addition",p:"Même signe : on additionne et on garde le signe. Signes contraires : on soustrait."},
+   {h:"Soustraction",p:"Soustraire, c'est ajouter l'opposé : a − (−b) = a + b."}],
+  gen(){const a=rnd(-15,-2),b=rnd(3,15);return{q:`(${a}) + ${b}`,a:String(a+b)}}},
+ {id:"5e_frac",t:"Fractions — dénominateurs différents",lecon:[
+   {h:"Méthode",p:"On met au même dénominateur, puis on additionne les numérateurs."},
+   {h:"Exemple",p:"1/2 + 1/3 = 3/6 + 2/6 = 5/6"}],
+  gen(){const d1=pick([2,3,4]),d2=pick([3,5,6]);const n1=rnd(1,d1-1),n2=rnd(1,d2-1);
+   const d=d1*d2,g=gcd(n1*d2+n2*d1,d);
+   const good=`${(n1*d2+n2*d1)/g}/${d/g}`;
+   return{q:`${n1}/${d1} + ${n2}/${d2} = ?`,a:good,opts:shuffle([good,`${(n1*d2+n2*d1)}/${d}`,`${n1+n2}/${d1+d2}`,`${(n1*d2+n2*d1+1)/g}/${d/g}`]).slice(0,4)}}},
+ {id:"5e_litt",t:"Calcul littéral",lecon:[
+   {h:"Réduire",p:"On additionne les termes de même nature : 3x + 5x = 8x."},
+   {h:"Attention",p:"x et x² ne s'additionnent pas."}],
+  gen(){const a=rnd(2,9),b=rnd(2,9),c=rnd(1,5);const k=a+b-c;
+   return{q:`Réduis : ${a}x + ${b}x − ${c}x`,a:`${k}x`,opts:shuffle([`${k}x`,`${a+b+c}x`,`${a*b-c}x`,`${k}x²`]).slice(0,4)}}},
+ {id:"5e_pct",t:"Pourcentages",lecon:[
+   {h:"Calcul",p:"p % de N = (p ÷ 100) × N"},
+   {h:"Astuce",p:"10 % = diviser par 10. 50 % = diviser par 2."}],
+  gen(){const p=pick([5,10,15,20,25,30,50]),n=pick([40,60,80,120,200,240]);
+   return{q:`${p} % de ${n}`,a:String(p*n/100)}}},
+ {id:"5e_vol",t:"Volumes",lecon:[
+   {h:"Pavé droit",p:"V = L × l × h, en cm³"},
+   {h:"Cube",p:"V = c × c × c"}],
+  gen(){const L=rnd(3,10),l=rnd(2,8),h=rnd(2,7);return{q:`Volume d'un pavé ${L} × ${l} × ${h} cm`,a:String(L*l*h),unit:"cm³"}}},
+ {id:"5e_stat",t:"Moyenne",lecon:[
+   {h:"Formule",p:"moyenne = somme des valeurs ÷ nombre de valeurs"},
+   {h:"Remarque",p:"La moyenne est toujours entre la plus petite et la plus grande valeur."}],
+  gen(){const k=4;const base=rnd(8,18);const vals=[base,base+2,base-2,base+4];
+   return{q:`Moyenne de ${vals.join(" ; ")}`,a:String(vals.reduce((a,b)=>a+b,0)/k)}}}
+],
+"4E":[
+ {id:"4e_puis",t:"Puissances",lecon:[
+   {h:"Définition",p:"a^n = a × a × … × a (n fois)"},
+   {h:"Règles",p:"a^m × a^n = a^(m+n) · (a^m)^n = a^(m×n)"}],
+  gen(){const a=pick([2,3,4,5]),n=pick([2,3,4]);return{q:`${a}^${n}`,a:String(Math.pow(a,n))}}},
+ {id:"4e_pyth",t:"Théorème de Pythagore",lecon:[
+   {h:"Formule",p:"Dans un triangle rectangle : a² + b² = c², où c est l'hypoténuse."},
+   {h:"Astuce",p:"Les triplets 3-4-5, 6-8-10, 5-12-13 sont à connaître."}],
+  gen(){const t=pick([[3,4,5],[6,8,10],[5,12,13],[9,12,15]]);
+   return{q:`Hypoténuse d'un triangle rectangle de côtés ${t[0]} et ${t[1]} cm`,a:String(t[2]),unit:"cm"}}},
+ {id:"4e_dev",t:"Développement",lecon:[
+   {h:"Distributivité",p:"k(a + b) = ka + kb"},
+   {h:"Exemple",p:"3(x + 4) = 3x + 12"}],
+  gen(){const k=rnd(2,9),a=rnd(2,9);const good=`${k}x + ${k*a}`;
+   return{q:`Développe : ${k}(x + ${a})`,a:good,opts:shuffle([good,`${k}x + ${a}`,`${k+a}x`,`${k}x + ${k+a}`]).slice(0,4)}}},
+ {id:"4e_eq",t:"Équations",lecon:[
+   {h:"Principe",p:"On fait la même opération des deux côtés pour isoler x."},
+   {h:"Méthode",p:"ax + b = c  →  x = (c − b) ÷ a"}],
+  gen(){const a=rnd(2,9),x=rnd(1,12),b=rnd(1,15);
+   return{q:`Résous : ${a}x + ${b} = ${a*x+b}`,a:String(x)}}},
+ {id:"4e_vit",t:"Vitesse",lecon:[
+   {h:"Formule",p:"v = d ÷ t · d = v × t · t = d ÷ v"},
+   {h:"Unités",p:"km/h si d en km et t en heures."}],
+  gen(){const v=pick([30,40,50,60,80,90]),t=pick([2,3,4,5]);
+   return{q:`Un véhicule roule à ${v} km/h pendant ${t} h. Distance ?`,a:String(v*t),unit:"km"}}},
+ {id:"4e_prob",t:"Probabilités",lecon:[
+   {h:"Formule",p:"P(A) = nombre de cas favorables ÷ nombre de cas possibles"},
+   {h:"Repère",p:"Une probabilité est toujours entre 0 et 1."}],
+  gen(){const r=rnd(2,6),b=rnd(2,6);const good=`${r}/${r+b}`;
+   return{q:`Urne : ${r} boules rouges, ${b} bleues. P(rouge) ?`,a:good,
+   opts:shuffle([good,`${r}/${b}`,`${b}/${r+b}`,`${r+1}/${r+b}`]).slice(0,4)}}}
+],
+"3E":[
+ {id:"3e_rac",t:"Racines carrées",lecon:[
+   {h:"Définition",p:"√a est le nombre positif dont le carré vaut a."},
+   {h:"À connaître",p:"√1=1 · √4=2 · √9=3 · √16=4 · √25=5 · √100=10 · √144=12"}],
+  gen(){const n=pick([1,4,9,16,25,36,49,64,81,100,121,144,169,196,225]);
+   return{q:`√${n}`,a:String(Math.sqrt(n))}}},
+ {id:"3e_thal",t:"Théorème de Thalès",lecon:[
+   {h:"Configuration",p:"Deux droites parallèles coupées par deux sécantes."},
+   {h:"Formule",p:"AM/AB = AN/AC = MN/BC"}],
+  gen(){const k=pick([2,3,4]),am=rnd(2,6),ab=am*k;const mn=rnd(3,9);
+   return{q:`Thalès : AM = ${am}, AB = ${ab}, MN = ${mn}. Combien vaut BC ?`,a:String(mn*k)}}},
+ {id:"3e_ident",t:"Identités remarquables",lecon:[
+   {h:"Carré d'une somme",p:"(a+b)² = a² + 2ab + b²"},
+   {h:"Différence",p:"(a−b)² = a² − 2ab + b² · (a+b)(a−b) = a² − b²"}],
+  gen(){const a=rnd(2,7);const good=`x² + ${2*a}x + ${a*a}`;
+   return{q:`Développe : (x + ${a})²`,a:good,
+   opts:shuffle([good,`x² + ${a*a}`,`x² + ${a}x + ${a*a}`,`x² + ${2*a}x + ${a}`]).slice(0,4)}}},
+ {id:"3e_eq",t:"Équations — x des deux côtés",lecon:[
+   {h:"Méthode",p:"On regroupe les x d'un côté, les nombres de l'autre."},
+   {h:"Exemple",p:"5x + 3 = 2x + 12  →  3x = 9  →  x = 3"}],
+  gen(){const a=rnd(3,9),b=rnd(2,a-1),x=rnd(1,10),c=rnd(1,10);const d=(a-b)*x+c;
+   return{q:`Résous : ${a}x + ${c} = ${b}x + ${d}`,a:String(x)}}},
+ {id:"3e_fonc",t:"Fonctions",lecon:[
+   {h:"Image",p:"f(x) = ax + b. L'image de x se calcule en remplaçant x."},
+   {h:"Exemple",p:"f(x) = 3x + 2, f(4) = 14"}],
+  gen(){const a=rnd(2,7),b=rnd(-5,9),x=rnd(-4,8);return{q:`f(x) = ${a}x ${b<0?"−":"+"} ${Math.abs(b)}. Calcule f(${x}).`,a:String(a*x+b)}}},
+ {id:"3e_prob",t:"Probabilités — événement contraire",lecon:[
+   {h:"Formule",p:"P(non A) = 1 − P(A)"},
+   {h:"Somme",p:"La somme des probabilités de tous les issues vaut 1."}],
+  gen(){const n=pick([4,5,8,10]),k=rnd(1,n-1);const p=k/n;
+   return{q:`P(A) = ${k}/${n}. Combien vaut P(non A) ?`,a:`${n-k}/${n}`,
+   opts:shuffle([`${n-k}/${n}`,`${k}/${n}`,`${n-k}/${k}`,`${k+1}/${n}`]).slice(0,4)}}}
+]
+};
+function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+const ALL_CHAPTERS=[].concat(...Object.values(M));
+
+/* ---------- state ---------- */
+function blank(){return{profile:null,xp:0,streak:0,best:0,last:null,minutes:0,good:0,bad:0,ch:{},history:{},created:Date.now(),gistId:null}}
+let S=(()=>{try{const r=JSON.parse(localStorage.getItem(KEY));return r&&r.ch?r:blank()}catch(e){return blank()}})();
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
+const TOKKEY="maths_tok";
+const tok=()=>{try{return localStorage.getItem(TOKKEY)||""}catch(e){return ""}};
+function touchDay(){const t=today();if(S.last===t)return;const y=new Date(Date.now()-864e5).toISOString().slice(0,10);
+ S.streak=S.last===y?S.streak+1:1;S.best=Math.max(S.best||0,S.streak);S.last=t;save()}
+function chState(id){if(!S.ch[id])S.ch[id]={n:0,ok:0};return S.ch[id]}
+function levelPct(lvl){
+  const cs=M[lvl];let s=0;
+  cs.forEach(c=>{const st=chState(c.id);s+=Math.min(1,st.ok/5)});
+  return Math.round(100*s/cs.length);
+}
+function mastered(){return Object.values(S.ch).filter(x=>x.ok>=5).length}
+
+/* ---------- render ---------- */
+function render(){
+  const a=$("#app");
+  if(!S.profile)return onboard(a);
+  switch(S._s||"home"){
+    case "levels":return levels(a);
+    case "chapter":return chapter(a);
+    case "quiz":return quiz(a);
+    case "stats":return stats(a);
+    case "profile":return profile(a);
+    case "lesson":return lesson(a);
+  }
+  home(a);
+}
+function go(s){S._s=s;render();window.scrollTo(0,0)}
+
+function onboard(a){
+  a.innerHTML=`<div style="margin-top:12vh;text-align:center">
+    <div style="font-size:64px">📐</div>
+    <h1 style="margin-top:10px">Maths — CM2 à 3e</h1>
+    <p class="muted" style="margin-top:6px">Leçons, exercices, progression.</p></div>
+  <div class="spacer"></div><div class="spacer"></div>
+  <div class="card stack">
+    <div><h3>Ton prénom</h3><input id="nm" type="text" placeholder="Prénom" style="text-align:left;font-size:16px;font-weight:400"></div>
+    <div><h3 style="margin-bottom:8px">Avatar</h3><div class="avs" id="avs">${AVATARS.map((x,i)=>`<button data-a="${x}" class="${i===0?'sel':''}">${x}</button>`).join("")}</div></div>
+    <div><h3 style="margin-bottom:8px">Niveau</h3><div class="grid3" id="lvs">${Object.entries(LEVELS).map(([k,L],i)=>`<button class="choice" data-l="${k}" style="text-align:center;${i===0?'border-color:var(--acc)':''}">${L.emoji}<br>${L.n}</button>`).join("")}</div></div>
+  </div>
+  <div class="spacer"></div>
+  <button class="btn" id="ok">Commencer</button>`;
+  let lvl="CM2";
+  a.querySelectorAll("#avs button").forEach(b=>b.onclick=()=>{a.querySelectorAll("#avs button").forEach(x=>x.classList.remove("sel"));b.classList.add("sel")});
+  a.querySelectorAll("#lvs button").forEach(b=>b.onclick=()=>{a.querySelectorAll("#lvs button").forEach(x=>x.style.borderColor="");b.style.borderColor="var(--acc)";lvl=b.dataset.l});
+  $("#ok").onclick=()=>{
+    const nm=($("#nm").value||"").trim().slice(0,18)||"Élève";
+    const av=(a.querySelector("#avs .sel")||{dataset:{a:"🦊"}}).dataset.a;
+    S.profile={name:nm,avatar:av,level:lvl,since:Date.now()};
+    touchDay();save();go("home");
+  };
+}
+
+function home(a){
+  touchDay();
+  const h=S.history[today()]||{xp:0,m:0};
+  const xp=Math.round(h.xp||0);
+  const pct=Math.min(100,Math.round(100*xp/GOAL_XP));
+  const lvl=S.profile.level||"CM2",L=LEVELS[lvl];
+  a.innerHTML=`
+  <div class="between">
+    <div class="row"><div style="font-size:30px">${S.profile.avatar}</div>
+      <div><b>${esc(S.profile.name)}</b><div class="tiny muted">${L.emoji} ${L.n} · ${L.sub}</div></div></div>
+    <div class="row" style="gap:6px"><span class="pill">🔥 ${S.streak}</span><span class="pill">⭐ ${S.xp}</span></div>
+  </div>
+  <div class="spacer"></div>
+  <div class="card row" style="gap:16px">
+    <div class="ring" style="--p:${pct}"><span>${xp}/${GOAL_XP}</span></div>
+    <div style="flex:1"><b>Objectif du jour</b>
+      <p class="small muted" style="margin-top:2px">${xp>=GOAL_XP?"Objectif atteint 🎉":"Encore "+(GOAL_XP-xp)+" XP"}</p>
+      <p class="tiny muted">${Math.round(h.m||0)} min aujourd'hui · ${Math.round(S.minutes)} min au total</p></div>
+  </div>
+  <div class="spacer"></div>
+  <button class="btn" id="go">▶️ Continuer</button>
+  <div style="height:10px"></div>
+  <button class="btn alt" id="lvlbtn">
+    <div class="row" style="gap:12px;text-align:left">
+      <div style="font-size:22px">${L.emoji}</div>
+      <div style="flex:1"><b>${L.n}</b><div class="tiny muted">${levelPct(lvl)}% du programme</div>
+        <div class="bar" style="margin-top:6px"><i style="width:${levelPct(lvl)}%"></i></div></div>
+      <div class="muted">›</div>
+    </div></button>
+  <div class="spacer"></div>
+  <div class="grid2">
+    <button class="btn alt" id="st">📊 Stats</button>
+    <button class="btn alt" id="pf">👤 Profil</button>
+  </div>`;
+  $("#go").onclick=()=>{
+    const cs=M[lvl];
+    let best=cs[0];
+    cs.forEach(c=>{if(chState(c.id).ok<5&&chState(best.id).ok>=5)best=c});
+    startQuiz(best.id);
+  };
+  $("#lvlbtn").onclick=()=>go("levels");
+  $("#st").onclick=()=>go("stats");
+  $("#pf").onclick=()=>go("profile");
+}
+
+function levels(a){
+  a.innerHTML=`<div class="top"><button class="back" onclick="go('home')">‹</button><h2>Programme</h2><span style="width:38px"></span></div>
+  <div class="stack" id="ls"></div>`;
+  Object.entries(LEVELS).forEach(([k,L])=>{
+    const b=el(`<button class="lvl" data-k="${k}">
+      <div class="ico" style="background:${L.c}22;color:${L.c}">${L.emoji}</div>
+      <div class="meta"><div class="between"><b>${L.n}</b><span class="tiny muted">${levelPct(k)}%</span></div>
+      <div class="tiny muted">${L.sub} · ${M[k].length} chapitres</div>
+      <div class="bar"><i style="width:${levelPct(k)}%;background:${L.c}"></i></div></div><div class="muted">›</div></button>`);
+    b.onclick=()=>{S.profile.level=k;save();go("chapter")};
+    $("#ls").appendChild(b);
+  });
+}
+
+function chapter(a){
+  const k=S.profile.level||"CM2",L=LEVELS[k];
+  a.innerHTML=`<div class="top"><button class="back" onclick="go('levels')">‹</button><h2>${L.emoji} ${L.n}</h2><span style="width:38px"></span></div>
+  <div class="stack" id="cs"></div>`;
+  M[k].forEach(c=>{
+    const st=chState(c.id);
+    const b=el(`<button class="lvl" data-id="${c.id}">
+      <div class="ico" style="background:${st.ok>=5?'#58cc0222':'#24334d55'};color:${st.ok>=5?'#58cc02':'#93a4bf'}">${st.ok>=5?"✓":"•"}</div>
+      <div class="meta"><div class="between"><b>${esc(c.t)}</b><span class="tiny muted">${st.ok}/5</span></div>
+      <div class="bar" style="margin-top:7px"><i style="width:${Math.min(100,st.ok*20)}%"></i></div></div><div class="muted">›</div></button>`);
+    b.onclick=()=>{S._ch=c.id;go("lesson")};
+    $("#cs").appendChild(b);
+  });
+}
+
+function chapterById(id){return ALL_CHAPTERS.find(c=>c.id===id)}
+
+function lesson(a){
+  const c=chapterById(S._ch);if(!c)return go("chapter");
+  a.innerHTML=`<div class="top"><button class="back" onclick="go('chapter')">‹</button><h2>${esc(c.t)}</h2><span style="width:38px"></span></div>
+  <div class="stack">${c.lecon.map(l=>`<div class="card"><h3>${esc(l.h)}</h3><p style="margin-top:6px">${esc(l.p)}</p></div>`).join("")}</div>
+  <div class="spacer"></div>
+  <button class="btn" id="ex">S'entraîner — 8 exercices</button>
+  <div style="height:10px"></div>
+  <button class="btn alt" id="bk">Retour</button>`;
+  $("#ex").onclick=()=>startQuiz(c.id);
+  $("#bk").onclick=()=>go("chapter");
+}
+
+/* ---------- quiz ---------- */
+let Q=null;
+function startQuiz(chId){
+  const c=chapterById(chId);
+  Q={c,i:0,n:8,ok:0,ko:0,cur:null,start:Date.now()};
+  nextQ();go("quiz");
+}
+function nextQ(){
+  const g=Q.c.gen();
+  Q.cur=g;
+}
+function quiz(a){
+  if(!Q)return go("home");
+  const bar=`<div class="bar" style="margin-bottom:14px"><i style="width:${Math.round(100*Q.i/Q.n)}%"></i></div>`;
+  const q=Q.cur;
+  const opts=q.opts;
+  a.innerHTML=`${bar}
+    <div class="top" style="margin-bottom:8px">
+      <button class="back" onclick="go('chapter')">‹</button>
+      <span class="tiny muted">${Q.i+1} / ${Q.n} · ${esc(Q.c.t)}</span>
+      <span class="tiny muted">${Q.ok} ✓</span>
+    </div>
+    <div class="cardq">
+      <div class="bigq" style="white-space:pre-line">${esc(q.q)}</div>
+      ${q.unit?`<div class="tiny muted" style="margin-top:6px">réponse en ${esc(q.unit)}</div>`:""}
+    </div>
+    ${opts?`<div id="o">${opts.map((x,i)=>`<button class="choice" data-v="${esc(x)}"><span class="k">${"ABCD"[i]}</span>${esc(x)}</button>`).join("")}</div>`
+      :`<div class="spacer"></div><input id="in" type="text" inputmode="decimal" placeholder="ta réponse" autocomplete="off">`}
+    <div class="feed"><div><button class="btn" id="nx" ${opts?"disabled":""}>${opts?"Répondre":"Valider"}</button></div></div>`;
+  let answered=false;
+  const check=(val)=>{
+    if(answered)return;answered=true;
+    const ok=String(val).trim()===String(q.a)||(num(val)!==null&&num(q.a)!==null&&Math.abs(num(val)-num(q.a))<1e-9);
+    if(ok){Q.ok++;S.good++;S.xp+=10;S.history[today()]=S.history[today()]||{xp:0,m:0};S.history[today()].xp=(S.history[today()].xp||0)+10}
+    else{Q.ko++;S.bad++;S.xp+=2;toast("Réponse : "+q.a)}
+    const st=chState(Q.c.id);st.n++;if(ok)st.ok=Math.min(9,st.ok+1);
+    save();
+    if(opts)a.querySelectorAll("#o .choice").forEach(b=>{if(b.dataset.v===String(q.a))b.classList.add("ok");else if(b.dataset.v===String(val))b.classList.add("no")});
+    $("#nx").textContent=Q.i+1>=Q.n?"Terminer":"Suivant";
+    $("#nx").disabled=false;
+  };
+  if(opts){
+    a.querySelectorAll("#o .choice").forEach(b=>b.onclick=()=>check(b.dataset.v));
+  }else{
+    const inp=$("#in");
+    inp.focus();
+    inp.onkeydown=e=>{if(e.key==="Enter")$("#nx").click()};
+    $("#nx").onclick=()=>{
+      if($("#nx").textContent==="Valider")check(inp.value);
+    };
+    $("#nx").onclick=()=>{
+      if(!answered){const v=inp.value;if(!v.trim())return;check(v)}
+      else{advance()}
+    };
+  }
+  if(opts)$("#nx").onclick=()=>{if(!answered){const sel=a.querySelector("#o .choice.sel");if(!sel)return toast("Choisis une réponse");check(sel.dataset.v)}else{advance()}};
+  a.querySelectorAll("#o .choice").forEach(b=>b.addEventListener("click",()=>{
+    a.querySelectorAll("#o .choice").forEach(x=>x.style.borderColor="");
+  },{once:false}));
+  function advance(){
+    Q.i++;
+    if(Q.i>=Q.n)return endQuiz();
+    nextQ();render();
+  }
+  Q._advance=advance;
+}
+function endQuiz(){
+  const mins=Math.max(1,Math.round((Date.now()-Q.start)/60000));
+  const acc=Math.round(100*Q.ok/(Q.n||1));
+  S.minutes+=mins;S.history[today()]=S.history[today()]||{xp:0,m:0};
+  S.history[today()].m=(S.history[today()].m||0)+mins;save();
+  const ok=Q.ok,n=Q.n,t=Q.c.t;
+  Q=null;
+  const a=$("#app");
+  a.innerHTML=`<div style="text-align:center;margin-top:7vh">
+    <div style="font-size:64px">${acc>=80?"🎉":acc>=50?"💪":"🌱"}</div>
+    <h1 style="margin-top:8px">${acc>=80?"Excellent !":acc>=50?"Bien joué":"On continue"}</h1>
+    <p class="muted" style="margin-top:6px">${esc(t)} · ${mins} min</p></div>
+  <div class="spacer"></div>
+  <div class="grid3"><div class="stat"><b>${ok}</b><i>justes</i></div>
+    <div class="stat"><b>${acc}%</b><i>réussite</i></div>
+    <div class="stat"><b>+${ok*10+(n-ok)*2}</b><i>xp</i></div></div>
+  <div class="spacer"></div>
+  <button class="btn" onclick="go('chapter')">Terminer</button>
+  <div style="height:10px"></div>
+  <button class="btn alt" onclick="startQuiz('${Q?'':''}')" id="again">Une autre série</button>`;
+  $("#again").onclick=()=>go("chapter");
+}
+
+/* ---------- stats & profile ---------- */
+function stats(a){
+  const days=[];let max=1;
+  for(let i=6;i>=0;i--){const d=new Date(Date.now()-i*864e5).toISOString().slice(0,10);
+    const m=Math.round(((S.history[d]||{}).m||0));days.push({d,m});max=Math.max(max,m)}
+  const acc=Math.round(100*S.good/((S.good+S.bad)||1));
+  a.innerHTML=`<div class="top"><button class="back" onclick="go('home')">‹</button><h2>Statistiques</h2><span style="width:38px"></span></div>
+  <div class="grid2">
+    <div class="stat"><b>${Math.floor(S.minutes/60)}h${String(Math.round(S.minutes%60)).padStart(2,"0")}</b><i>temps</i></div>
+    <div class="stat"><b>${S.streak}</b><i>série</i></div>
+    <div class="stat"><b>${S.best||0}</b><i>record</i></div>
+    <div class="stat"><b>${acc}%</b><i>réussite</i></div>
+    <div class="stat"><b>${Object.values(S.ch).filter(x=>x.n>0).length}</b><i>chapitres</i></div>
+    <div class="stat"><b>${mastered()}</b><i>maîtrisés</i></div>
+  </div>
+  <div class="spacer"></div>
+  <div class="card"><h3>7 derniers jours</h3>
+    <div class="bars" style="margin-top:12px">${days.map(x=>`<div><i style="height:${Math.max(4,100*x.m/max)}%"></i><span>${["D","L","M","M","J","V","S"][new Date(x.d+"T12:00:00").getDay()]}</span></div>`).join("")}</div>
+    <p class="tiny muted" style="margin-top:8px">minutes par jour</p></div>
+  <div class="spacer"></div><h3>Par niveau</h3><div class="spacer"></div>
+  <div class="stack">${Object.entries(LEVELS).map(([k,L])=>`<div class="card"><div class="between"><b>${L.emoji} ${L.n}</b><span class="tiny muted">${levelPct(k)}%</span></div>
+    <div class="bar" style="margin-top:8px"><i style="width:${levelPct(k)}%;background:${L.c}"></i></div></div>`).join("")}</div>`;
+}
+
+function profile(a){
+  const p=S.profile;
+  a.innerHTML=`<div class="top"><button class="back" onclick="go('home')">‹</button><h2>Profil</h2><span style="width:38px"></span></div>
+  <div class="card" style="text-align:center"><div style="font-size:56px">${p.avatar}</div>
+    <h2 style="margin-top:6px">${esc(p.name)}</h2>
+    <p class="small muted">Depuis le ${new Date(p.since).toLocaleDateString("fr-FR")}</p>
+    <div class="spacer"></div>
+    <div class="grid3"><div class="stat"><b>${S.xp}</b><i>xp</i></div>
+      <div class="stat"><b>${S.streak}</b><i>série</i></div>
+      <div class="stat"><b>${mastered()}</b><i>maîtrisés</i></div></div></div>
+  <div class="spacer"></div>
+  <div class="card"><h3>Niveau</h3><div class="spacer"></div>
+    <div class="stack">${Object.entries(LEVELS).map(([k,L])=>`<button class="choice" data-l="${k}" style="${k===(p.level||"CM2")?"border-color:var(--acc)":""}">${L.emoji} ${L.n} <span class="muted small">· ${L.sub}</span></button>`).join("")}</div></div>
+  <div class="spacer"></div>
+  <div class="card"><h3>Synchronisation</h3>
+    <p class="tiny muted" style="margin-top:4px">Même progression sur iPhone et PC, via un Gist GitHub privé.</p>
+    <div class="spacer"></div>
+    <input id="tk" type="password" placeholder="Token GitHub (droits : gist)" value="${tok()?"••••••••••":""}" style="text-align:left;font-size:14px;font-weight:400">
+    <div style="height:10px"></div>
+    <button class="btn blue" id="sy">🔄 Synchroniser</button>
+    <p class="tiny muted" style="margin-top:10px">${S.synced?"Dernière synchro : "+new Date(S.synced).toLocaleString("fr-FR"):"Jamais synchronisé"}</p></div>
+  <div class="spacer"></div>
+  <div class="card"><h3>Réglages</h3><div class="spacer"></div>
+    <button class="btn alt" id="exp">⬇️ Exporter</button>
+    <div style="height:10px"></div>
+    <button class="btn alt" id="imp">⬆️ Importer</button>
+    <input id="fi" type="file" accept="application/json" style="display:none">
+    <div style="height:10px"></div>
+    <button class="btn alt" id="rst" style="color:#ff9a9a">♻️ Réinitialiser</button></div>
+  <p class="tiny muted" style="text-align:center;margin-top:16px">v1 · données sur ton téléphone</p>`;
+  a.querySelectorAll("[data-l]").forEach(b=>b.onclick=()=>{p.level=b.dataset.l;save();toast("Niveau : "+LEVELS[b.dataset.l].n);render()});
+  $("#sy").onclick=()=>{const v=$("#tk").value.trim();if(v&&v.indexOf("•")!==0)localStorage.setItem(TOKKEY,v);ghSync()};
+  $("#exp").onclick=()=>{const b=new Blob([JSON.stringify(S,null,2)],{type:"application/json"});
+    const u=URL.createObjectURL(b),i=document.createElement("a");i.href=u;i.download="maths-progress.json";i.click();URL.revokeObjectURL(u)};
+  $("#imp").onclick=()=>$("#fi").click();
+  $("#fi").onchange=e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();
+    r.onload=()=>{try{S=mergeState(S,JSON.parse(r.result));save();toast("Importé ✓");render()}catch(x){toast("Fichier invalide")}};r.readAsText(f)};
+  $("#rst").onclick=()=>{if(confirm("Effacer toute la progression ?")){localStorage.removeItem(KEY);S=blank();location.reload()}};
+}
+
+function mergeState(a,b){
+  const o=JSON.parse(JSON.stringify(a));b=b||{};
+  ["xp","streak","best","minutes","good","bad"].forEach(k=>o[k]=Math.max(a[k]||0,b[k]||0));
+  o.last=[a.last||"",b.last||""].sort().pop();
+  o.ch=Object.assign({},b.ch||{});
+  Object.keys(a.ch||{}).forEach(k=>{const v=a.ch[k],w=o.ch[k];
+    o.ch[k]=w?{n:Math.max(v.n||0,w.n||0),ok:Math.max(v.ok||0,w.ok||0)}:v});
+  o.history=Object.assign({},b.history||{});
+  Object.keys(a.history||{}).forEach(k=>{const v=a.history[k]||{},w=o.history[k]||{};
+    o.history[k]={xp:Math.max(v.xp||0,w.xp||0),m:Math.max(v.m||0,w.m||0)}});
+  o.profile=a.profile||b.profile;o.gistId=a.gistId||b.gistId;
+  return o;
+}
+async function ghSync(){
+  const t=tok();if(!t)return toast("Ajoute un token GitHub");
+  const base="https://api.github.com";
+  const h={Authorization:"***"+t,Accept:"application/vnd.github+json","Content-Type":"application/json"};
+  try{
+    if(S.gistId){
+      const r=await fetch(base+"/gists/"+S.gistId,{headers:h});
+      if(r.ok){const g=await r.json();const f=g.files&&g.files["maths-progress.json"];
+        if(f&&f.content){try{S=mergeState(S,JSON.parse(f.content))}catch(e){}}}
+    }
+    const payload=JSON.stringify({description:"Maths — progression (privé)",public:false,
+      files:{"maths-progress.json":{content:JSON.stringify(S)}}});
+    const r2=S.gistId?await fetch(base+"/gists/"+S.gistId,{method:"PATCH",headers:h,body:payload})
+                      :await fetch(base+"/gists",{method:"POST",headers:h,body:payload});
+    if(!r2.ok)throw new Error("HTTP "+r2.status);
+    const g2=await r2.json();S.gistId=g2.id;S.synced=Date.now();save();
+    toast("Synchronisé ✓");render();
+  }catch(e){toast("Échec : "+e.message)}
+}
+
+/* ---------- minute clock ---------- */
+setInterval(()=>{if(!S.profile)return;const t=today();
+  S.history[t]=S.history[t]||{xp:0,m:0};S.history[t].m=(S.history[t].m||0)+1/6;S.minutes+=1/6;save()},10000);
+
+if("serviceWorker" in navigator)navigator.serviceWorker.register("sw.js").catch(()=>{});
+render();
+</script>
+</body>
+</html>
