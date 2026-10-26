@@ -223,6 +223,12 @@ border:1px solid var(--stroke2);border-radius:18px;padding:13px;margin-top:9px}
 .qline b{font-size:15px}
 .qline .fr{color:var(--dim);font-size:13px;margin-top:2px}
 hr{border:0;border-top:1px solid rgba(255,255,255,.10);margin:16px 0}
+.fb{margin-top:13px;padding:14px 15px;border-radius:16px;font-weight:700;font-size:14.5px;line-height:1.5;
+-webkit-backdrop-filter:blur(18px);backdrop-filter:blur(18px)}
+.fb.ok{background:rgba(90,209,0,.15);border:1px solid rgba(120,230,60,.42);color:#c9ffa8}
+.fb.no{background:rgba(255,70,70,.13);border:1px solid rgba(255,90,90,.42);color:#ffc9c9}
+.fb.no b{color:#ff6b6b}
+.fb.ok b{color:#9dff6b}
 </style>
 </head>
 <body>
@@ -605,6 +611,12 @@ function quiz(a){
     if(opts)a.querySelectorAll("#o .choice").forEach(b=>{if(b.dataset.v===String(q.a))b.classList.add("ok");else if(b.dataset.v===String(val))b.classList.add("no")});
     $("#nx").textContent=Q.i+1>=Q.n?"Terminer":"Suivant";
     $("#nx").disabled=false;
+    const fb=document.createElement("div");
+    fb.className="fb "+(ok?"ok":"no");
+    fb.innerHTML=ok?("✓ Juste — <b>"+esc(q.a)+(q.unit?" "+q.unit:"")+"</b>")
+                   :("✗ Faux. La bonne réponse est <b>"+esc(q.a)+(q.unit?" "+q.unit:"")+"</b>");
+    const fd=document.querySelector(".feed");
+    if(fd)fd.parentElement.insertBefore(fb,fd);
   };
   if(opts){
     a.querySelectorAll("#o .choice").forEach(b=>b.onclick=()=>check(b.dataset.v));
