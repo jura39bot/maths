@@ -447,7 +447,12 @@ function demoTick(){
   DEMO.step++;
   render();
   const st=d.steps[DEMO.step];
-  try{speak(st.txt)}catch(e){}
+  demoSay(DEMO.i,DEMO.step,st.txt);
+}
+function demoClip(i,step){ return "audio/demo/"+(i===0?"a":"s")+step+".mp3"; }
+function demoSay(i,step,txt){
+  try{ unlockAudio(); }catch(e){}
+  playClipWA(demoClip(i,step),1,()=>{}).then(ok=>{ if(!ok){ try{speak(txt)}catch(e){} } });
 }
 function demoGrid(d,step){
   const n=Math.max(d.a.length,d.b.length)+1;
@@ -488,6 +493,8 @@ function demoScreen(a){
       <div class="say">${st.txt}</div>
     </div>
     <div class="spacer"></div>
+    <button class="btn alt" id="say">🔊 Réécouter la phrase</button>
+    <div style="height:10px"></div>
     <div class="grid3">
       <button class="btn alt" id="prev">◀︎</button>
       <button class="btn" id="play">${DEMO.playing?"⏸ Pause":"▶︎ Lire"}</button>
@@ -496,6 +503,7 @@ function demoScreen(a){
     <div style="height:10px"></div>
     <button class="btn alt" id="restart">🔄 Recommencer</button>`;
   a.querySelectorAll("[data-d]").forEach(b=>b.onclick=()=>{demoStop();DEMO.i=+b.dataset.d;DEMO.step=0;render()});
+  $("#say").onclick=()=>demoSay(DEMO.i,DEMO.step,d.steps[DEMO.step].txt);
   $("#prev").onclick=()=>{demoStop();if(DEMO.step>0)DEMO.step--;render()};
   $("#next").onclick=()=>{demoStop();if(DEMO.step<d.steps.length-1)DEMO.step++;render()};
   $("#restart").onclick=()=>{demoStop();DEMO.step=0;render()};
@@ -503,7 +511,7 @@ function demoScreen(a){
     if(DEMO.playing){demoStop();render();return}
     if(DEMO.step>=d.steps.length-1)DEMO.step=0;
     DEMO.playing=true;render();
-    speak(d.steps[DEMO.step].txt);
+    demoSay(DEMO.i,DEMO.step,d.steps[DEMO.step].txt);
     DEMO.timer=setInterval(demoTick,5200);
   };
 }
@@ -1189,7 +1197,7 @@ function profile(a){
     <input id="fi" type="file" accept="application/json" style="display:none">
     <div style="height:10px"></div>
     <button class="btn alt" id="rst" style="color:#ff9a9a">♻️ Réinitialiser</button></div>
-  <p class="tiny muted" style="text-align:center;margin-top:16px">v11 · 26/10 22:19 · données sur ton téléphone</p>`;
+  <p class="tiny muted" style="text-align:center;margin-top:16px">v12 · 26/10 22:22 · données sur ton téléphone</p>`;
   a.querySelectorAll("[data-l]").forEach(b=>b.onclick=()=>{p.level=b.dataset.l;save();toast("Niveau : "+LEVELS[b.dataset.l].n);render()});
   $("#ren").onclick=()=>{const v=prompt("Ton prénom",p.name);if(v&&v.trim()){p.name=v.trim().slice(0,18);save();render()}};
   $("#sy").onclick=()=>{const v=$("#tk").value.trim();if(v&&v.indexOf("•")!==0)localStorage.setItem(TOKKEY,v);ghSync()};
