@@ -515,8 +515,13 @@ function demoScreen(a){
     DEMO.timer=setInterval(demoTick,5200);
   };
 }
+function poseN(p){
+  const a=parseInt(p.a,10), b=parseInt(p.b,10);
+  const r=String(p.op==="+"?a+b:a-b);
+  return Math.max(p.a.length,p.b.length,r.length);
+}
 function poseHTML(p){
-  const n=Math.max(p.a.length,p.b.length)+1;
+  const n=poseN(p);
   const cols=`20px repeat(${n},minmax(0,1fr))`;
   const pad=s=>s.padStart(n," ").split("");
   const ra=pad(p.a), rb=pad(p.b);
@@ -534,7 +539,7 @@ function poseHTML(p){
   return h;
 }
 function poseCarries(p){
-  const n=Math.max(p.a.length,p.b.length)+1;
+  const n=poseN(p);
   const A=p.a.padStart(n,"0").split("").map(Number);
   const B=p.b.padStart(n,"0").split("").map(Number);
   const out=new Array(n).fill("");
@@ -1030,7 +1035,7 @@ function quiz(a){
     fb.innerHTML=ok?("✓ Juste — <b>"+rep+"</b>"+panel)
                    :((q.speak?"✗ Faux. Le nombre était <b>":"✗ Faux. La bonne réponse est <b>")+rep+"</b>"+panel);
     if(q.pose){
-      const n=Math.max(q.pose.a.length,q.pose.b.length)+1;
+      const n=poseN(q.pose);
       const ans=String(q.a).padStart(n," ").split("");
       for(let i=0;i<n;i++){
         const e=document.getElementById("r"+i);
@@ -1084,7 +1089,7 @@ function quiz(a){
   if(opts){
     a.querySelectorAll("#o .choice").forEach(b=>b.onclick=()=>check(b.dataset.v));
   }else if(q.pose){
-    const n=Math.max(q.pose.a.length,q.pose.b.length)+1;
+    const n=poseN(q.pose);
     const first=$("#r"+(n-1));
     if(first) setTimeout(()=>{try{first.focus()}catch(e){}},200);
     $("#nx").onclick=()=>{
@@ -1197,7 +1202,7 @@ function profile(a){
     <input id="fi" type="file" accept="application/json" style="display:none">
     <div style="height:10px"></div>
     <button class="btn alt" id="rst" style="color:#ff9a9a">♻️ Réinitialiser</button></div>
-  <p class="tiny muted" style="text-align:center;margin-top:16px">v12 · 26/10 22:22 · données sur ton téléphone</p>`;
+  <p class="tiny muted" style="text-align:center;margin-top:16px">v13 · 26/10 22:24 · données sur ton téléphone</p>`;
   a.querySelectorAll("[data-l]").forEach(b=>b.onclick=()=>{p.level=b.dataset.l;save();toast("Niveau : "+LEVELS[b.dataset.l].n);render()});
   $("#ren").onclick=()=>{const v=prompt("Ton prénom",p.name);if(v&&v.trim()){p.name=v.trim().slice(0,18);save();render()}};
   $("#sy").onclick=()=>{const v=$("#tk").value.trim();if(v&&v.indexOf("•")!==0)localStorage.setItem(TOKKEY,v);ghSync()};
