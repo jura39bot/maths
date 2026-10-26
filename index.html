@@ -289,6 +289,7 @@ const LEVELS={
 };
 const AVATARS=["🐧","🦊","🐼","🦉","🐙","🦁","🐸","🐨","🦄","🐺","🦖","🦕","🐉","🦦","🦥","🦔","🐢","🦩","🦚","🐳","🦈","🦋","🐝","🦜"];
 const GOAL_XP=50;
+const LESSONS=[{"id":"cm2_dictee","t":"Dictée de nombres","steps":[{"h":"Écouter et écrire","p":"L'app te dicte un nombre. Écris-le en chiffres dans le champ, puis valide."},{"h":"Les rangs","p":"De droite à gauche : unités, dizaines, centaines, milliers, dizaines de milliers, centaines de millions… Chaque rang vaut dix fois celui de droite."},{"h":"Le repère du mille","p":"« cent vingt-sept mille un » = 127 001. Le mot « mille » marque la séparation entre les milliers et les unités."},{"h":"Astuce","p":"Écoute deux fois. Note d'abord le nombre de milliers, puis les trois derniers chiffres."}]},{"id":"cm2_calc","t":"Calcul mental","steps":[{"h":"Multiplier","p":"On pose la multiplication et on additionne les résultats partiels."},{"h":"Astuce","p":"Pour ×9 : multiplie par 10 puis enlève le nombre. 7×9 = 70−7 = 63."},{"h":"Priorités","p":"D'abord les parenthèses, puis × et ÷, enfin + et −."}]},{"id":"cm2_pose","t":"Opérations posées","steps":[{"h":"Aligner les colonnes","p":"On écrit les nombres l'un sous l'autre : unités sous unités, dizaines sous dizaines, centaines sous centaines."},{"h":"Addition","p":"On additionne colonne par colonne en partant de la droite. Si le total dépasse 9, on écrit le chiffre des unités et on retient 1 au-dessus de la colonne suivante."},{"h":"Soustraction","p":"Si le chiffre du haut est plus petit que celui du bas, on emprunte une dizaine à gauche. On note la retenue au-dessus."},{"h":"Comment répondre","p":"Écris les chiffres du résultat dans les cases du bas, en partant de la droite. Les cases au-dessus sont les retenues."}]},{"id":"cm2_tables","t":"Tables de 1 à 10","steps":[{"h":"Le principe","p":"Multiplier, c'est additionner plusieurs fois le même nombre. 7 × 3 = 7 + 7 + 7 = 21."},{"h":"Table de 10","p":"Il suffit d'ajouter un zéro : 6 × 10 = 60. C'est la plus facile, sers-t'en comme repère."},{"h":"Table de 5","p":"Le résultat finit toujours par 0 ou 5 : 5, 10, 15, 20, 25, 30, 35, 40, 45, 50."},{"h":"Table de 9","p":"Multiplie par 10 puis enlève le nombre : 9 × 7 = 70 − 7 = 63."},{"h":"Table de 2 et 4","p":"× 2 c'est doubler. × 4 c'est doubler deux fois : 4 × 6 = 12 puis 24."}]},{"id":"cm2_frac","t":"Fractions","steps":[{"h":"Même dénominateur","p":"On additionne les numérateurs, le dénominateur ne change pas."},{"h":"Formule","p":"a/d + b/d = (a+b)/d"}]},{"id":"cm2_dec","t":"Nombres décimaux","steps":[{"h":"Addition","p":"On aligne les virgules avant de calculer."},{"h":"Multiplication par 10","p":"La virgule se décale d'un rang vers la droite."}]},{"id":"cm2_prop","t":"Proportionnalité","steps":[{"h":"Prix unitaire","p":"On divise le prix total par la quantité pour avoir le prix d'un objet."},{"h":"Formule","p":"prix = prix unitaire × quantité"}]},{"id":"cm2_geo","t":"Périmètres et aires","steps":[{"h":"Rectangle — périmètre","p":"P = 2 × (L + l)"},{"h":"Rectangle — aire","p":"A = L × l, en cm²"},{"h":"Carré","p":"P = 4 × c et A = c × c"}]},{"id":"cm2_conv","t":"Conversions","steps":[{"h":"Tableau des longueurs","p":"km kilomètre · hm hectomètre · dam décamètre · m mètre · dm décimètre · cm centimètre · mm millimètre. Chaque colonne vaut 10 fois celle de droite."},{"h":"Le décalage","p":"m → cm : 2 colonnes vers la droite, donc × 100. m → mm : 3 colonnes, donc × 1 000."},{"h":"Exemple","p":"4,2 m = 42 dm = 420 cm = 4 200 mm. On ajoute un zéro par colonne franchie."},{"h":"Tableau des masses","p":"kg kilogramme · hg hectogramme · dag décagramme · g gramme · dg décigramme · cg centigramme · mg milligramme. Même principe : 1 kg = 1 000 g."},{"h":"Tableau des capacités","p":"kL kilolitre · hL hectolitre · daL décalitre · L litre · dL décilitre · cL centilitre · mL millilitre. 1 L = 1 000 mL = 1 dm³."}]},{"id":"6e_frac","t":"Simplifier une fraction","steps":[{"h":"Principe","p":"On divise le numérateur et le dénominateur par le même nombre."},{"h":"Jusqu'au bout","p":"On s'arrête quand ils n'ont plus de diviseur commun."}]},{"id":"6e_dec","t":"Décimaux","steps":[{"h":"Comparer","p":"On compare d'abord la partie entière, puis les dixièmes, etc."},{"h":"× 10 / × 100","p":"La virgule se décale de 1 ou 2 rangs."}]},{"id":"6e_prop","t":"Tableau de proportionnalité","steps":[{"h":"Passage à l'unité","p":"On divise par la première quantité, puis on multiplie par la seconde."},{"h":"Produit en croix","p":"a/b = c/d  →  a × d = b × c"}]},{"id":"6e_ang","t":"Angles","steps":[{"h":"Complémentaires","p":"Deux angles dont la somme fait 90°."},{"h":"Supplémentaires","p":"Deux angles dont la somme fait 180°."}]},{"id":"6e_air","t":"Aire du triangle","steps":[{"h":"Formule","p":"A = (base × hauteur) ÷ 2"},{"h":"Attention","p":"La hauteur est perpendiculaire à la base."}]},{"id":"6e_div","t":"Diviseurs et PGCD","steps":[{"h":"Diviseur","p":"Un nombre qui divise sans reste."},{"h":"PGCD","p":"Le plus grand diviseur commun à deux nombres."}]},{"id":"5e_rel","t":"Nombres relatifs","steps":[{"h":"Addition","p":"Même signe : on additionne et on garde le signe. Signes contraires : on soustrait."},{"h":"Soustraction","p":"Soustraire, c'est ajouter l'opposé : a − (−b) = a + b."}]},{"id":"5e_frac","t":"Fractions — dénominateurs différents","steps":[{"h":"Méthode","p":"On met au même dénominateur, puis on additionne les numérateurs."},{"h":"Exemple","p":"1/2 + 1/3 = 3/6 + 2/6 = 5/6"}]},{"id":"5e_litt","t":"Calcul littéral","steps":[{"h":"Réduire","p":"On additionne les termes de même nature : 3x + 5x = 8x."},{"h":"Attention","p":"x et x² ne s'additionnent pas."}]},{"id":"5e_pct","t":"Pourcentages","steps":[{"h":"Calcul","p":"p % de N = (p ÷ 100) × N"},{"h":"Astuce","p":"10 % = diviser par 10. 50 % = diviser par 2."}]},{"id":"5e_vol","t":"Volumes","steps":[{"h":"Pavé droit","p":"V = L × l × h, en cm³"},{"h":"Cube","p":"V = c × c × c"}]},{"id":"5e_stat","t":"Moyenne","steps":[{"h":"Formule","p":"moyenne = somme des valeurs ÷ nombre de valeurs"},{"h":"Remarque","p":"La moyenne est toujours entre la plus petite et la plus grande valeur."}]},{"id":"4e_puis","t":"Puissances","steps":[{"h":"Définition","p":"a^n = a × a × … × a (n fois)"},{"h":"Règles","p":"a^m × a^n = a^(m+n) · (a^m)^n = a^(m×n)"}]},{"id":"4e_pyth","t":"Théorème de Pythagore","steps":[{"h":"Formule","p":"Dans un triangle rectangle : a² + b² = c², où c est l'hypoténuse."},{"h":"Astuce","p":"Les triplets 3-4-5, 6-8-10, 5-12-13 sont à connaître."}]},{"id":"4e_dev","t":"Développement","steps":[{"h":"Distributivité","p":"k(a + b) = ka + kb"},{"h":"Exemple","p":"3(x + 4) = 3x + 12"}]},{"id":"4e_eq","t":"Équations","steps":[{"h":"Principe","p":"On fait la même opération des deux côtés pour isoler x."},{"h":"Méthode","p":"ax + b = c  →  x = (c − b) ÷ a"}]},{"id":"4e_vit","t":"Vitesse","steps":[{"h":"Formule","p":"v = d ÷ t · d = v × t · t = d ÷ v"},{"h":"Unités","p":"km/h si d en km et t en heures."}]},{"id":"4e_prob","t":"Probabilités","steps":[{"h":"Formule","p":"P(A) = nombre de cas favorables ÷ nombre de cas possibles"},{"h":"Repère","p":"Une probabilité est toujours entre 0 et 1."}]},{"id":"3e_rac","t":"Racines carrées","steps":[{"h":"Définition","p":"√a est le nombre positif dont le carré vaut a."},{"h":"À connaître","p":"√1=1 · √4=2 · √9=3 · √16=4 · √25=5 · √100=10 · √144=12"}]},{"id":"3e_thal","t":"Théorème de Thalès","steps":[{"h":"Configuration","p":"Deux droites parallèles coupées par deux sécantes."},{"h":"Formule","p":"AM/AB = AN/AC = MN/BC"}]},{"id":"3e_ident","t":"Identités remarquables","steps":[{"h":"Carré d'une somme","p":"(a+b)² = a² + 2ab + b²"},{"h":"Différence","p":"(a−b)² = a² − 2ab + b² · (a+b)(a−b) = a² − b²"}]},{"id":"3e_eq","t":"Équations — x des deux côtés","steps":[{"h":"Méthode","p":"On regroupe les x d'un côté, les nombres de l'autre."},{"h":"Exemple","p":"5x + 3 = 2x + 12  →  3x = 9  →  x = 3"}]},{"id":"3e_fonc","t":"Fonctions","steps":[{"h":"Image","p":"f(x) = ax + b. L'image de x se calcule en remplaçant x."},{"h":"Exemple","p":"f(x) = 3x + 2, f(4) = 14"}]},{"id":"3e_prob","t":"Probabilités — événement contraire","steps":[{"h":"Formule","p":"P(non A) = 1 − P(A)"},{"h":"Somme","p":"La somme des probabilités de tous les issues vaut 1."}]}];
 const NUMDICT=[{"n":"135","f":"135.mp3","w":""},{"n":"206","f":"206.mp3","w":""},{"n":"232","f":"232.mp3","w":""},{"n":"337","f":"337.mp3","w":""},{"n":"383","f":"383.mp3","w":""},{"n":"494","f":"494.mp3","w":""},{"n":"630","f":"630.mp3","w":""},{"n":"641","f":"641.mp3","w":""},{"n":"652","f":"652.mp3","w":""},{"n":"655","f":"655.mp3","w":""},{"n":"743","f":"743.mp3","w":""},{"n":"754","f":"754.mp3","w":""},{"n":"826","f":"826.mp3","w":""},{"n":"855","f":"855.mp3","w":""},{"n":"857","f":"857.mp3","w":""},{"n":"868","f":"868.mp3","w":""},{"n":"893","f":"893.mp3","w":""},{"n":"966","f":"966.mp3","w":""},{"n":"1449","f":"1449.mp3","w":""},{"n":"1801","f":"1801.mp3","w":""},{"n":"1831","f":"1831.mp3","w":""},{"n":"2075","f":"2075.mp3","w":""},{"n":"2255","f":"2255.mp3","w":""},{"n":"2519","f":"2519.mp3","w":""},{"n":"2648","f":"2648.mp3","w":""},{"n":"2748","f":"2748.mp3","w":""},{"n":"3556","f":"3556.mp3","w":""},{"n":"4066","f":"4066.mp3","w":""},{"n":"5471","f":"5471.mp3","w":""},{"n":"5851","f":"5851.mp3","w":""},{"n":"5990","f":"5990.mp3","w":""},{"n":"6275","f":"6275.mp3","w":""},{"n":"6344","f":"6344.mp3","w":""},{"n":"6467","f":"6467.mp3","w":""},{"n":"6762","f":"6762.mp3","w":""},{"n":"7140","f":"7140.mp3","w":""},{"n":"7687","f":"7687.mp3","w":""},{"n":"7703","f":"7703.mp3","w":""},{"n":"8262","f":"8262.mp3","w":""},{"n":"9484","f":"9484.mp3","w":""},{"n":"11027","f":"11027.mp3","w":""},{"n":"12584","f":"12584.mp3","w":""},{"n":"13108","f":"13108.mp3","w":""},{"n":"25090","f":"25090.mp3","w":""},{"n":"29818","f":"29818.mp3","w":""},{"n":"31166","f":"31166.mp3","w":""},{"n":"39636","f":"39636.mp3","w":""},{"n":"45035","f":"45035.mp3","w":""},{"n":"49301","f":"49301.mp3","w":""},{"n":"52080","f":"52080.mp3","w":""},{"n":"57136","f":"57136.mp3","w":""},{"n":"59753","f":"59753.mp3","w":""},{"n":"62256","f":"62256.mp3","w":""},{"n":"66529","f":"66529.mp3","w":""},{"n":"67615","f":"67615.mp3","w":""},{"n":"68627","f":"68627.mp3","w":""},{"n":"69997","f":"69997.mp3","w":""},{"n":"73324","f":"73324.mp3","w":""},{"n":"77192","f":"77192.mp3","w":""},{"n":"83786","f":"83786.mp3","w":""},{"n":"88226","f":"88226.mp3","w":""},{"n":"88946","f":"88946.mp3","w":""},{"n":"96738","f":"96738.mp3","w":""},{"n":"99417","f":"99417.mp3","w":""},{"n":"116515","f":"116515.mp3","w":""},{"n":"206524","f":"206524.mp3","w":""},{"n":"297475","f":"297475.mp3","w":""},{"n":"300570","f":"300570.mp3","w":""},{"n":"338893","f":"338893.mp3","w":""},{"n":"376297","f":"376297.mp3","w":""},{"n":"396241","f":"396241.mp3","w":""},{"n":"398992","f":"398992.mp3","w":""},{"n":"407673","f":"407673.mp3","w":""},{"n":"474136","f":"474136.mp3","w":""},{"n":"479393","f":"479393.mp3","w":""},{"n":"499724","f":"499724.mp3","w":""},{"n":"512735","f":"512735.mp3","w":""},{"n":"515695","f":"515695.mp3","w":""},{"n":"532848","f":"532848.mp3","w":""},{"n":"559103","f":"559103.mp3","w":""},{"n":"677115","f":"677115.mp3","w":""},{"n":"681845","f":"681845.mp3","w":""},{"n":"690478","f":"690478.mp3","w":""},{"n":"768170","f":"768170.mp3","w":""},{"n":"826520","f":"826520.mp3","w":""},{"n":"883281","f":"883281.mp3","w":""},{"n":"957269","f":"957269.mp3","w":""},{"n":"971795","f":"971795.mp3","w":""},{"n":"1819335","f":"1819335.mp3","w":""},{"n":"2085789","f":"2085789.mp3","w":""},{"n":"2090493","f":"2090493.mp3","w":""},{"n":"5157162","f":"5157162.mp3","w":""},{"n":"5217666","f":"5217666.mp3","w":""}];
 
 /* ---------- utils ---------- */
@@ -481,6 +482,53 @@ function demoGrid(d,step){
   h+=`</div>`;
   return h;
 }
+function coursScreen(a){
+  const ch=(typeof LESSONS!=="undefined")?LESSONS.find(x=>x.id===S._ch):null;
+  if(!ch)return go("lesson");
+  const i=Math.min(S._csi||0, ch.steps.length-1);
+  const st=ch.steps[i];
+  const pct=Math.round(100*(i+1)/ch.steps.length);
+  a.innerHTML=`<div class="top"><button class="back" onclick="coursStop();go('lesson')">‹</button><h2>${esc(ch.t)}</h2><span style="width:40px"></span></div>
+    <div class="between" style="margin-bottom:8px">
+      <span class="pill">Étape ${i+1} / ${ch.steps.length}</span>
+      <span class="tiny muted">${esc(ch.id.split("_")[0].toUpperCase())}</span>
+    </div>
+    <div class="bar" style="margin-bottom:14px"><i style="width:${pct}%"></i></div>
+    <div class="cardq">
+      <h3 style="color:#8fd4ff">${esc(st.h)}</h3>
+      <p style="margin-top:10px;font-size:16.5px;line-height:1.6">${esc(st.p)}</p>
+    </div>
+    <div class="spacer"></div>
+    <button class="btn alt" id="say">🔊 Réécouter</button>
+    <div style="height:10px"></div>
+    <div class="grid3">
+      <button class="btn alt" id="prev">◀︎</button>
+      <button class="btn" id="play">${S._csp?"⏸ Pause":"▶︎ Lire"}</button>
+      <button class="btn alt" id="next">▶︎</button>
+    </div>
+    <div style="height:10px"></div>
+    <button class="btn alt" id="restart">🔄 Recommencer</button>`;
+  const clip=`audio/lessons/${ch.id}_${i}.mp3`;
+  const say=()=>playClipWA(clip,1,()=>{ if(S._csp) setTimeout(coursNext,900); }).then(ok=>{ if(!ok) speak(st.h+". "+st.p) });
+  a.querySelectorAll("[data-x]").forEach(()=>{});
+  $("#say").onclick=()=>{unlockAudio();say()};
+  $("#prev").onclick=()=>{coursStop();if(i>0)S._csi=i-1;render()};
+  $("#next").onclick=()=>{coursStop();if(i<ch.steps.length-1)S._csi=i+1;render()};
+  $("#restart").onclick=()=>{coursStop();S._csi=0;render()};
+  $("#play").onclick=()=>{
+    if(S._csp){coursStop();render();return}
+    S._csp=true;render();
+    setTimeout(()=>{unlockAudio();say()},120);
+  };
+}
+function coursNext(){
+  const ch=(typeof LESSONS!=="undefined")?LESSONS.find(x=>x.id===S._ch):null;
+  if(!ch)return;
+  if((S._csi||0)>=ch.steps.length-1){S._csp=false;render();return}
+  S._csi=(S._csi||0)+1;render();
+  setTimeout(()=>{ const cl=`audio/lessons/${ch.id}_${S._csi}.mp3`; playClipWA(cl,1,()=>{ if(S._csp) setTimeout(coursNext,900); }); },150);
+}
+function coursStop(){ S._csp=false; try{speechSynthesis.cancel()}catch(e){} }
 function demoScreen(a){
   const d=DEMOS[DEMO.i];
   const st=d.steps[DEMO.step];
@@ -854,6 +902,7 @@ function render(){
     case "profile":return profile(a);
     case "lesson":return lesson(a);
     case "demo":return demoScreen(a);
+    case "cours":return coursScreen(a);
   }
   home(a);
 }
@@ -965,11 +1014,15 @@ function lesson(a){
   a.innerHTML=`<div class="top"><button class="back" onclick="go('chapter')">‹</button><h2>${esc(c.t)}</h2><span style="width:38px"></span></div>
   <div class="stack">${c.lecon.map(l=>`<div class="card"><h3>${esc(l.h)}</h3><p style="margin-top:6px">${esc(l.p)}</p></div>`).join("")}</div>
   <div class="spacer"></div>
+  <button class="btn" id="cours">▶︎ Cours animé</button>
+  <div style="height:10px"></div>
   <button class="btn blue" id="demo">▶︎ Voir un exemple animé</button>
   <div style="height:10px"></div>
   <button class="btn" id="ex">S'entraîner — 8 exercices</button>
   <div style="height:10px"></div>
   <button class="btn alt" id="bk">Retour</button>`;
+  const cb=$("#cours");
+  if(cb)cb.onclick=()=>{S._csi=0;S._csp=false;go("cours")};
   const db=$("#demo");
   if(db)db.onclick=()=>{DEMO.step=0;DEMO.i=(c.id==="cm2_pose")?0:0;go("demo")};
   $("#ex").onclick=()=>startQuiz(c.id);
@@ -1205,7 +1258,7 @@ function profile(a){
     <input id="fi" type="file" accept="application/json" style="display:none">
     <div style="height:10px"></div>
     <button class="btn alt" id="rst" style="color:#ff9a9a">♻️ Réinitialiser</button></div>
-  <p class="tiny muted" style="text-align:center;margin-top:16px">v14 · 26/10 22:26 · données sur ton téléphone</p>`;
+  <p class="tiny muted" style="text-align:center;margin-top:16px">v15 · 26/10 22:47 · données sur ton téléphone</p>`;
   a.querySelectorAll("[data-l]").forEach(b=>b.onclick=()=>{p.level=b.dataset.l;save();toast("Niveau : "+LEVELS[b.dataset.l].n);render()});
   $("#ren").onclick=()=>{const v=prompt("Ton prénom",p.name);if(v&&v.trim()){p.name=v.trim().slice(0,18);save();render()}};
   $("#sy").onclick=()=>{const v=$("#tk").value.trim();if(v&&v.indexOf("•")!==0)localStorage.setItem(TOKKEY,v);ghSync()};
