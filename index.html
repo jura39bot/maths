@@ -254,6 +254,7 @@ const LEVELS={
 };
 const AVATARS=["🐧","🦊","🐼","🦉","🐙","🦁","🐸","🐨","🦄","🐺","🦖","🦕","🐉","🦦","🦥","🦔","🐢","🦩","🦚","🐳","🦈","🦋","🐝","🦜"];
 const GOAL_XP=50;
+const NUMDICT=[{"n":"135","f":"135.mp3","w":""},{"n":"206","f":"206.mp3","w":""},{"n":"232","f":"232.mp3","w":""},{"n":"337","f":"337.mp3","w":""},{"n":"383","f":"383.mp3","w":""},{"n":"494","f":"494.mp3","w":""},{"n":"630","f":"630.mp3","w":""},{"n":"641","f":"641.mp3","w":""},{"n":"652","f":"652.mp3","w":""},{"n":"655","f":"655.mp3","w":""},{"n":"743","f":"743.mp3","w":""},{"n":"754","f":"754.mp3","w":""},{"n":"826","f":"826.mp3","w":""},{"n":"855","f":"855.mp3","w":""},{"n":"857","f":"857.mp3","w":""},{"n":"868","f":"868.mp3","w":""},{"n":"893","f":"893.mp3","w":""},{"n":"966","f":"966.mp3","w":""},{"n":"1449","f":"1449.mp3","w":""},{"n":"1801","f":"1801.mp3","w":""},{"n":"1831","f":"1831.mp3","w":""},{"n":"2075","f":"2075.mp3","w":""},{"n":"2255","f":"2255.mp3","w":""},{"n":"2519","f":"2519.mp3","w":""},{"n":"2648","f":"2648.mp3","w":""},{"n":"2748","f":"2748.mp3","w":""},{"n":"3556","f":"3556.mp3","w":""},{"n":"4066","f":"4066.mp3","w":""},{"n":"5471","f":"5471.mp3","w":""},{"n":"5851","f":"5851.mp3","w":""},{"n":"5990","f":"5990.mp3","w":""},{"n":"6275","f":"6275.mp3","w":""},{"n":"6344","f":"6344.mp3","w":""},{"n":"6467","f":"6467.mp3","w":""},{"n":"6762","f":"6762.mp3","w":""},{"n":"7140","f":"7140.mp3","w":""},{"n":"7687","f":"7687.mp3","w":""},{"n":"7703","f":"7703.mp3","w":""},{"n":"8262","f":"8262.mp3","w":""},{"n":"9484","f":"9484.mp3","w":""},{"n":"11027","f":"11027.mp3","w":""},{"n":"12584","f":"12584.mp3","w":""},{"n":"13108","f":"13108.mp3","w":""},{"n":"25090","f":"25090.mp3","w":""},{"n":"29818","f":"29818.mp3","w":""},{"n":"31166","f":"31166.mp3","w":""},{"n":"39636","f":"39636.mp3","w":""},{"n":"45035","f":"45035.mp3","w":""},{"n":"49301","f":"49301.mp3","w":""},{"n":"52080","f":"52080.mp3","w":""},{"n":"57136","f":"57136.mp3","w":""},{"n":"59753","f":"59753.mp3","w":""},{"n":"62256","f":"62256.mp3","w":""},{"n":"66529","f":"66529.mp3","w":""},{"n":"67615","f":"67615.mp3","w":""},{"n":"68627","f":"68627.mp3","w":""},{"n":"69997","f":"69997.mp3","w":""},{"n":"73324","f":"73324.mp3","w":""},{"n":"77192","f":"77192.mp3","w":""},{"n":"83786","f":"83786.mp3","w":""},{"n":"88226","f":"88226.mp3","w":""},{"n":"88946","f":"88946.mp3","w":""},{"n":"96738","f":"96738.mp3","w":""},{"n":"99417","f":"99417.mp3","w":""},{"n":"116515","f":"116515.mp3","w":""},{"n":"206524","f":"206524.mp3","w":""},{"n":"297475","f":"297475.mp3","w":""},{"n":"300570","f":"300570.mp3","w":""},{"n":"338893","f":"338893.mp3","w":""},{"n":"376297","f":"376297.mp3","w":""},{"n":"396241","f":"396241.mp3","w":""},{"n":"398992","f":"398992.mp3","w":""},{"n":"407673","f":"407673.mp3","w":""},{"n":"474136","f":"474136.mp3","w":""},{"n":"479393","f":"479393.mp3","w":""},{"n":"499724","f":"499724.mp3","w":""},{"n":"512735","f":"512735.mp3","w":""},{"n":"515695","f":"515695.mp3","w":""},{"n":"532848","f":"532848.mp3","w":""},{"n":"559103","f":"559103.mp3","w":""},{"n":"677115","f":"677115.mp3","w":""},{"n":"681845","f":"681845.mp3","w":""},{"n":"690478","f":"690478.mp3","w":""},{"n":"768170","f":"768170.mp3","w":""},{"n":"826520","f":"826520.mp3","w":""},{"n":"883281","f":"883281.mp3","w":""},{"n":"957269","f":"957269.mp3","w":""},{"n":"971795","f":"971795.mp3","w":""},{"n":"1819335","f":"1819335.mp3","w":""},{"n":"2085789","f":"2085789.mp3","w":""},{"n":"2090493","f":"2090493.mp3","w":""},{"n":"5157162","f":"5157162.mp3","w":""},{"n":"5217666","f":"5217666.mp3","w":""}];
 
 /* ---------- utils ---------- */
 const $=s=>document.querySelector(s);
@@ -298,6 +299,16 @@ function frVoice(){
   if(female)return female;
   const notMale=vs.find(v=>!MALE_FR.test(v.name||""));
   return notMale||vs[0];
+}
+let CLIP=null;
+function playClip(src,rate){
+  try{
+    if(CLIP){CLIP.pause();CLIP.currentTime=0}
+    CLIP=new Audio(src);
+    CLIP.volume=1;
+    if(rate)CLIP.playbackRate=rate;
+    CLIP.play().catch(()=>{ if(AUDIO_OK)speak("") });
+  }catch(e){}
 }
 function speak(text,rate){
   try{
@@ -371,10 +382,8 @@ CM2:[
    {h:"Le repère du mille",p:"« cent vingt-sept mille un » = 127 001. Le mot « mille » marque la séparation entre les milliers et les unités."},
    {h:"Astuce",p:"Écoute deux fois. Note d'abord le nombre de milliers, puis les trois derniers chiffres."}],
   gen(){
-    const len=pick([3,4,5,6,6,6,7]);
-    let n=String(rnd(1,9));
-    for(let i=1;i<len;i++)n+=String(rnd(0,9));
-    return {q:"Écoute et écris le nombre",a:n,speak:n,places:true};
+    const e=NUMDICT[Math.floor(Math.random()*NUMDICT.length)];
+    return {q:"Écoute et écris le nombre",a:e.n,speak:frNum(parseInt(e.n,10)),audio:"audio/"+e.f,places:true};
   }},
  {id:"cm2_calc",t:"Calcul mental",lecon:[
    {h:"Multiplier",p:"On pose la multiplication et on additionne les résultats partiels."},
@@ -746,10 +755,11 @@ function quiz(a){
   };
   if(q.speak){
     const sp=$("#sp"), sl=$("#sl"), sv=$("#sv");
-    if(sp)sp.onclick=()=>{unlockAudio();speak(q.speak,.85)};
-    if(sl)sl.onclick=()=>{unlockAudio();speak(q.speak,.5)};
-    if(sv)sv.onclick=()=>{unlockAudio();speak("Voici la voix de la dictée. Cent vingt-sept mille un",.8)};
-    if(!Q.spoken){Q.spoken=true;setTimeout(()=>{if(AUDIO_OK)speak(q.speak,.85)},450)}
+    const play=(r)=>{unlockAudio(); if(q.audio)playClip(q.audio,r||1); else speak(q.speak,r||.85)};
+    if(sp)sp.onclick=()=>play(1);
+    if(sl)sl.onclick=()=>play(0.65);
+    if(sv)sv.onclick=()=>{unlockAudio(); if(NUMDICT.length)playClip("audio/"+NUMDICT[0].f)};
+    if(!Q.spoken){ Q.spoken=true; setTimeout(()=>{ if(q.audio)playClip(q.audio); else if(AUDIO_OK)speak(q.speak,.85); },400); }
   }
   if(opts){
     a.querySelectorAll("#o .choice").forEach(b=>b.onclick=()=>check(b.dataset.v));
