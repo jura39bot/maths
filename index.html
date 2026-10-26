@@ -239,10 +239,11 @@ border:1px solid rgba(255,255,255,.16)}
 .place.hi{border-color:rgba(120,230,60,.55);background:rgba(90,209,0,.14)}
 .biglisten{font-size:46px;text-align:center;margin:6px 0}
 
-.entry{margin-top:16px;display:flex;gap:9px;align-items:stretch}
-.entry input{flex:1;min-width:0;font-size:24px;padding:16px;text-align:center;letter-spacing:2px}
-.okbtn{width:60px;flex:0 0 auto;border-radius:16px;font-size:24px;font-weight:800;color:#05260a;
+.entry{margin-top:16px}
+.entry input{width:100%;font-size:24px;padding:16px;text-align:center;letter-spacing:2px}
+.okbtn{width:100%;margin-top:10px;padding:16px;border-radius:16px;font-size:18px;font-weight:800;color:#05260a;
 background:linear-gradient(180deg,#86ec3a,#55c400);box-shadow:0 8px 20px rgba(85,196,0,.35),inset 0 1px 0 rgba(255,255,255,.5)}
+.okbtn:active{transform:scale(.985)}
 .feed input[type=text]{font-size:22px;padding:14px;text-align:center;width:100%}
 
 </style>
@@ -769,7 +770,7 @@ function quiz(a){
     ${opts?`<div id="o">${opts.map((x,i)=>`<button class="choice" data-v="${esc(x)}"><span class="k">${"ABCD"[i]}</span>${esc(x)}</button>`).join("")}</div>`
       :`<div class="entry">
           <input id="in" type="text" inputmode="numeric" enterkeyhint="done" placeholder="le nombre entendu" autocomplete="off" autocorrect="off" spellcheck="false">
-          <button class="okbtn" id="ok2" aria-label="Valider">✓</button>
+          <button class="okbtn" id="ok2">Valider ✓</button>
         </div>
         <p class="tiny muted" style="text-align:center;margin-top:8px">écoute puis écris le nombre en chiffres</p>`}
     <div class="feed"><div><button class="btn" id="nx" ${opts?"disabled":""}>${opts?"Répondre":"Valider"}</button></div></div>`;
@@ -837,7 +838,8 @@ function quiz(a){
       else{advance()}
     };
     $("#nx").onclick=submit;
-    const ok2=$("#ok2"); if(ok2)ok2.onclick=submit;
+    const ok2=$("#ok2");
+    if(ok2){ ok2.addEventListener("pointerdown",ev=>ev.preventDefault()); ok2.onclick=submit; }
   }
   if(opts)$("#nx").onclick=()=>{if(!answered){const sel=a.querySelector("#o .choice.sel");if(!sel)return toast("Choisis une réponse");check(sel.dataset.v)}else{advance()}};
   a.querySelectorAll("#o .choice").forEach(b=>b.addEventListener("click",()=>{
