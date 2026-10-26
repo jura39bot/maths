@@ -802,21 +802,26 @@ function quiz(a){
   if(q.speak){
     const sp=$("#sp"), sl=$("#sl"), sv=$("#sv");
     [sp,sl,sv].forEach(b=>{ if(b) b.addEventListener("pointerdown",ev=>ev.preventDefault()); });
-    const play=(r)=>{
-      unlockAudio();
-      refocus();
-      if(q.audio){
-        playClipWA(q.audio,r||1,()=>setTimeout(refocus,50)).then(ok=>{
-          if(!ok){ playClip(q.audio,r||1); if(CLIP)CLIP.onended=()=>setTimeout(refocus,60); }
+    const play=(r,slow)=>{
+      unlockAudio(); refocus();
+      const base=q.audio;
+      const src=slow&&base?base.replace("audio/","audio/slow/"):base;
+      if(base){
+        playClipWA(src,slow?1:(r||1),()=>setTimeout(refocus,50)).then(ok=>{
+          if(!ok && slow){
+            playClipWA(base,0.75,()=>setTimeout(refocus,50));
+            return;
+          }
+          if(!ok){ playClip(base,r||1); if(CLIP)CLIP.onended=()=>setTimeout(refocus,60); }
           setTimeout(refocus,150);
         });
       } else {
-        speak(q.speak,r||.85);
+        speak(q.speak,slow?0.62:(r||.85));
         setTimeout(refocus,900);
       }
     };
     if(sp)sp.onclick=()=>play(1);
-    if(sl)sl.onclick=()=>play(0.65);
+    if(sl)sl.onclick=()=>play(1,true);
     if(sv)sv.onclick=()=>{unlockAudio(); if(NUMDICT.length)playClip("audio/"+NUMDICT[0].f); setTimeout(refocus,150)};
     if(!Q.spoken){
       Q.spoken=true;
