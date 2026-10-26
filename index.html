@@ -229,6 +229,15 @@ hr{border:0;border-top:1px solid rgba(255,255,255,.10);margin:16px 0}
 .fb.no{background:rgba(255,70,70,.13);border:1px solid rgba(255,90,90,.42);color:#ffc9c9}
 .fb.no b{color:#ff6b6b}
 .fb.ok b{color:#9dff6b}
+
+.places{display:flex;gap:6px;justify-content:center;margin-top:12px;flex-wrap:wrap}
+.place{min-width:52px;padding:8px 6px;border-radius:12px;text-align:center;
+background:linear-gradient(160deg,rgba(255,255,255,.12),rgba(255,255,255,.04));
+border:1px solid rgba(255,255,255,.16)}
+.place b{display:block;font-size:21px;line-height:1.1}
+.place span{display:block;font-size:8px;color:#93a4bf;text-transform:uppercase;letter-spacing:.03em;line-height:1.25;margin-top:5px}
+.place.hi{border-color:rgba(120,230,60,.55);background:rgba(90,209,0,.14)}
+.biglisten{font-size:46px;text-align:center;margin:6px 0}
 </style>
 </head>
 <body>
@@ -257,9 +266,71 @@ function toast(m){const t=$("#toast");t.textContent=m;t.classList.add("on");clea
 const today=()=>new Date().toISOString().slice(0,10);
 function num(v){const s=String(v).replace(/\s/g,"").replace(",",".").replace(/^\+/,"");const n=parseFloat(s);return isNaN(n)?null:n}
 
+
+function speak(text,rate){
+  try{
+    if(!window.speechSynthesis)return;
+    speechSynthesis.cancel();
+    const u=new SpeechSynthesisUtterance(String(text));
+    u.lang="fr-FR";u.rate=rate||0.85;
+    const v=speechSynthesis.getVoices().find(x=>/fr(-|_)/i.test(x.lang));
+    if(v)u.voice=v;
+    speechSynthesis.speak(u);
+  }catch(e){}
+}
+function frNum(n){
+  const u=["zéro","un","deux","trois","quatre","cinq","six","sept","huit","neuf","dix","onze","douze","treize","quatorze","quinze","seize","dix-sept","dix-huit","dix-neuf"];
+  const t=["","","vingt","trente","quarante","cinquante","soixante"];
+  function b100(x){
+    if(x<20)return u[x];
+    const d=Math.floor(x/10),r=x%10;
+    if(d===7)return "soixante"+(r===1?"-et-":"-")+u[10+r];
+    if(d===9)return "quatre-vingt-"+u[10+r];
+    if(d===8)return "quatre-vingt"+(r===0?"s":"-"+u[r]);
+    if(r===0)return t[d];
+    if(r===1)return t[d]+"-et-un";
+    return t[d]+"-"+u[r];
+  }
+  function b1000(x){
+    if(x<100)return b100(x);
+    const c=Math.floor(x/100),r=x%100;
+    const head=c===1?"cent":u[c]+" cent"+(r===0?"s":"");
+    return head+(r?" "+b100(r):"");
+  }
+  if(n===0)return "zéro";
+  const parts=[];
+  const m=Math.floor(n/1e6),k=Math.floor((n%1e6)/1000),r=n%1000;
+  if(m)parts.push(m===1?"un million":b1000(m)+" millions");
+  if(k)parts.push(k===1?"mille":b1000(k)+" mille");
+  if(r)parts.push(b1000(r));
+  return parts.join(" ");
+}
+function placesPanel(numStr){
+  const labels=["unités","dizaines","centaines","milliers","dizaines de milliers","centaines de milliers","millions","dizaines de millions"];
+  const digits=String(numStr).split("");
+  const cells=digits.map((d,i)=>{
+    const rank=digits.length-1-i;
+    const hi=(d!=="0")?" hi":"";
+    return `<div class="place${hi}"><b>${d}</b><span>${labels[rank]||""}</span></div>`;
+  }).join("");
+  return `<div class="places">${cells}</div>
+    <div style="text-align:center;margin-top:10px;font-weight:700;color:#9fe870">${frNum(parseInt(numStr,10))}</div>`;
+}
+
 /* ---------- content ---------- */
 const M={
 CM2:[
+ {id:"cm2_dictee",t:"Dictée de nombres",lecon:[
+   {h:"Écouter et écrire",p:"L'app te dicte un nombre. Écris-le en chiffres dans le champ, puis valide."},
+   {h:"Les rangs",p:"De droite à gauche : unités, dizaines, centaines, milliers, dizaines de milliers, centaines de millions… Chaque rang vaut dix fois celui de droite."},
+   {h:"Le repère du mille",p:"« cent vingt-sept mille un » = 127 001. Le mot « mille » marque la séparation entre les milliers et les unités."},
+   {h:"Astuce",p:"Écoute deux fois. Note d'abord le nombre de milliers, puis les trois derniers chiffres."}],
+  gen(){
+    const len=pick([3,4,5,6,6,6,7]);
+    let n=String(rnd(1,9));
+    for(let i=1;i<len;i++)n+=String(rnd(0,9));
+    return {q:"Écoute et écris le nombre",a:n,speak:n,places:true};
+  }},
  {id:"cm2_calc",t:"Calcul mental",lecon:[
    {h:"Multiplier",p:"On pose la multiplication et on additionne les résultats partiels."},
    {h:"Astuce",p:"Pour ×9 : multiplie par 10 puis enlève le nombre. 7×9 = 70−7 = 63."},
@@ -581,6 +652,7 @@ function startQuiz(chId){
 function nextQ(){
   const g=Q.c.gen();
   Q.cur=g;
+  Q.spoken=false;
 }
 function quiz(a){
   if(!Q)return go("home");
@@ -594,7 +666,14 @@ function quiz(a){
       <span class="tiny muted">${Q.ok} ✓</span>
     </div>
     <div class="cardq">
-      <div class="bigq" style="white-space:pre-line">${esc(q.q)}</div>
+      ${q.speak
+        ? `<div class="tiny muted" style="text-align:center;letter-spacing:.08em;text-transform:uppercase;font-weight:800">Dictée</div>
+           <div class="biglisten">🔊</div>
+           <div class="row" style="justify-content:center;gap:8px">
+             <button class="pill" id="sp">Réécouter</button>
+             <button class="pill" id="sl">🐢 Lent</button>
+           </div>`
+        : `<div class="bigq" style="white-space:pre-line">${esc(q.q)}</div>`}
       ${q.unit?`<div class="tiny muted" style="margin-top:6px">réponse en ${esc(q.unit)}</div>`:""}
     </div>
     ${opts?`<div id="o">${opts.map((x,i)=>`<button class="choice" data-v="${esc(x)}"><span class="k">${"ABCD"[i]}</span>${esc(x)}</button>`).join("")}</div>`
@@ -613,11 +692,18 @@ function quiz(a){
     $("#nx").disabled=false;
     const fb=document.createElement("div");
     fb.className="fb "+(ok?"ok":"no");
-    fb.innerHTML=ok?("✓ Juste — <b>"+esc(q.a)+(q.unit?" "+q.unit:"")+"</b>")
-                   :("✗ Faux. La bonne réponse est <b>"+esc(q.a)+(q.unit?" "+q.unit:"")+"</b>");
+    const panel=q.places?placesPanel(q.a):"";
+    fb.innerHTML=ok?("✓ Juste — <b>"+esc(q.a)+(q.unit?" "+q.unit:"")+"</b>"+panel)
+                   :("✗ Faux. Le nombre était <b>"+esc(q.a)+(q.unit?" "+q.unit:"")+"</b>"+panel);
     const fd=document.querySelector(".feed");
     if(fd)fd.parentElement.insertBefore(fb,fd);
   };
+  if(q.speak){
+    const sp=$("#sp"), sl=$("#sl");
+    if(sp)sp.onclick=()=>speak(q.speak,.85);
+    if(sl)sl.onclick=()=>speak(q.speak,.5);
+    if(!Q.spoken){Q.spoken=true;setTimeout(()=>speak(q.speak,.85),350)}
+  }
   if(opts){
     a.querySelectorAll("#o .choice").forEach(b=>b.onclick=()=>check(b.dataset.v));
   }else{
