@@ -239,8 +239,10 @@ border:1px solid rgba(255,255,255,.16)}
 .place.hi{border-color:rgba(120,230,60,.55);background:rgba(90,209,0,.14)}
 .biglisten{font-size:46px;text-align:center;margin:6px 0}
 
-.entry{margin-top:16px}
-.entry input{width:100%;font-size:24px;padding:16px;text-align:center;letter-spacing:2px}
+.entry{margin-top:16px;display:flex;gap:9px;align-items:stretch}
+.entry input{flex:1;min-width:0;font-size:24px;padding:16px;text-align:center;letter-spacing:2px}
+.okbtn{width:60px;flex:0 0 auto;border-radius:16px;font-size:24px;font-weight:800;color:#05260a;
+background:linear-gradient(180deg,#86ec3a,#55c400);box-shadow:0 8px 20px rgba(85,196,0,.35),inset 0 1px 0 rgba(255,255,255,.5)}
 .feed input[type=text]{font-size:22px;padding:14px;text-align:center;width:100%}
 
 </style>
@@ -305,7 +307,35 @@ function frVoice(){
   const notMale=vs.find(v=>!MALE_FR.test(v.name||""));
   return notMale||vs[0];
 }
-let CLIP=null;
+let CLIP=null, ACTX=null, ABUF={};
+function actx(){
+  try{
+    if(!ACTX){const C=window.AudioContext||window.webkitAudioContext; if(!C)return null; ACTX=new C();}
+    if(ACTX.state==="suspended")ACTX.resume();
+    return ACTX;
+  }catch(e){return null;}
+}
+async function playClipWA(src,rate,onend){
+  const c=actx();
+  if(!c) return false;
+  try{
+    let b=ABUF[src];
+    if(!b){
+      const r=await fetch(src);
+      const ab=await r.arrayBuffer();
+      b=await c.decodeAudioData(ab);
+      ABUF[src]=b;
+    }
+    const s=c.createBufferSource();
+    s.buffer=b;
+    s.playbackRate.value=rate||1;
+    const g=c.createGain(); g.gain.value=1;
+    s.connect(g); g.connect(c.destination);
+    s.onended=()=>{ if(onend)onend(); };
+    s.start();
+    return true;
+  }catch(e){ return false; }
+}
 function playClip(src,rate){
   try{
     if(CLIP){CLIP.pause();CLIP.currentTime=0}
@@ -737,7 +767,11 @@ function quiz(a){
       ${q.unit?`<div class="tiny muted" style="margin-top:6px">réponse en ${esc(q.unit)}</div>`:""}
     </div>
     ${opts?`<div id="o">${opts.map((x,i)=>`<button class="choice" data-v="${esc(x)}"><span class="k">${"ABCD"[i]}</span>${esc(x)}</button>`).join("")}</div>`
-      :`<div class="entry"><input id="in" type="text" inputmode="numeric" placeholder="le nombre entendu" autocomplete="off" autocorrect="off" spellcheck="false"><p class="tiny muted" style="text-align:center;margin-top:8px">écoute puis écris le nombre en chiffres</p></div>`}
+      :`<div class="entry">
+          <input id="in" type="text" inputmode="numeric" enterkeyhint="done" placeholder="le nombre entendu" autocomplete="off" autocorrect="off" spellcheck="false">
+          <button class="okbtn" id="ok2" aria-label="Valider">✓</button>
+        </div>
+        <p class="tiny muted" style="text-align:center;margin-top:8px">écoute puis écris le nombre en chiffres</p>`}
     <div class="feed"><div><button class="btn" id="nx" ${opts?"disabled":""}>${opts?"Répondre":"Valider"}</button></div></div>`;
   let answered=false;
   const check=(val)=>{
@@ -769,10 +803,16 @@ function quiz(a){
     [sp,sl,sv].forEach(b=>{ if(b) b.addEventListener("pointerdown",ev=>ev.preventDefault()); });
     const play=(r)=>{
       unlockAudio();
-      if(q.audio){ playClip(q.audio,r||1); if(CLIP)CLIP.onended=()=>setTimeout(refocus,60); }
-      else speak(q.speak,r||.85);
-      setTimeout(refocus,150);
-      setTimeout(refocus,1200);
+      refocus();
+      if(q.audio){
+        playClipWA(q.audio,r||1,()=>setTimeout(refocus,50)).then(ok=>{
+          if(!ok){ playClip(q.audio,r||1); if(CLIP)CLIP.onended=()=>setTimeout(refocus,60); }
+          setTimeout(refocus,150);
+        });
+      } else {
+        speak(q.speak,r||.85);
+        setTimeout(refocus,900);
+      }
     };
     if(sp)sp.onclick=()=>play(1);
     if(sl)sl.onclick=()=>play(0.65);
@@ -792,10 +832,12 @@ function quiz(a){
       inp.onkeydown=e=>{if(e.key==="Enter")$("#nx").click()};
       setTimeout(refocus,200);
     }
-    $("#nx").onclick=()=>{
+    const submit=()=>{
       if(!answered){const v=inp?inp.value:"";if(!v.trim()){toast("Écris le nombre");return}check(v)}
       else{advance()}
     };
+    $("#nx").onclick=submit;
+    const ok2=$("#ok2"); if(ok2)ok2.onclick=submit;
   }
   if(opts)$("#nx").onclick=()=>{if(!answered){const sel=a.querySelector("#o .choice.sel");if(!sel)return toast("Choisis une réponse");check(sel.dataset.v)}else{advance()}};
   a.querySelectorAll("#o .choice").forEach(b=>b.addEventListener("click",()=>{
