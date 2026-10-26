@@ -239,7 +239,8 @@ border:1px solid rgba(255,255,255,.16)}
 .place.hi{border-color:rgba(120,230,60,.55);background:rgba(90,209,0,.14)}
 .biglisten{font-size:46px;text-align:center;margin:6px 0}
 
-.feed .entry{width:100%;margin-bottom:10px}
+.entry{margin-top:16px}
+.entry input{width:100%;font-size:24px;padding:16px;text-align:center;letter-spacing:2px}
 .feed input[type=text]{font-size:22px;padding:14px;text-align:center;width:100%}
 
 </head>
@@ -734,11 +735,9 @@ function quiz(a){
         : `<div class="bigq" style="white-space:pre-line">${esc(q.q)}</div>`}
       ${q.unit?`<div class="tiny muted" style="margin-top:6px">réponse en ${esc(q.unit)}</div>`:""}
     </div>
-    ${opts?`<div id="o">${opts.map((x,i)=>`<button class="choice" data-v="${esc(x)}"><span class="k">${"ABCD"[i]}</span>${esc(x)}</button>`).join("")}</div>`:""}
-    <div class="feed"><div>
-      ${opts?"":`<div class="entry"><input id="in" type="text" inputmode="numeric" placeholder="le nombre entendu" autocomplete="off" autocorrect="off" spellcheck="false"></div>`}
-      <button class="btn" id="nx" ${opts?"disabled":""}>${opts?"Répondre":"Valider"}</button>
-    </div></div>`;
+    ${opts?`<div id="o">${opts.map((x,i)=>`<button class="choice" data-v="${esc(x)}"><span class="k">${"ABCD"[i]}</span>${esc(x)}</button>`).join("")}</div>`
+      :`<div class="entry"><input id="in" type="text" inputmode="numeric" placeholder="le nombre entendu" autocomplete="off" autocorrect="off" spellcheck="false"><p class="tiny muted" style="text-align:center;margin-top:8px">écoute puis écris le nombre en chiffres</p></div>`}
+    <div class="feed"><div><button class="btn" id="nx" ${opts?"disabled":""}>${opts?"Répondre":"Valider"}</button></div></div>`;
   let answered=false;
   const check=(val)=>{
     if(answered)return;answered=true;
@@ -759,7 +758,11 @@ function quiz(a){
     if(fd)fd.parentElement.insertBefore(fb,fd);
   };
   const field=$("#in");
-  const refocus=()=>{ if(field){ try{field.focus({preventScroll:true})}catch(e){field.focus()} } };
+  const refocus=()=>{
+    const f=$("#in"); if(!f)return;
+    try{ f.focus({preventScroll:true}) }catch(e){ try{f.focus()}catch(_){} }
+    try{ f.scrollIntoView({block:"center",behavior:"smooth"}) }catch(e){}
+  };
   if(q.speak){
     const sp=$("#sp"), sl=$("#sl"), sv=$("#sv");
     [sp,sl,sv].forEach(b=>{ if(b) b.addEventListener("pointerdown",ev=>ev.preventDefault()); });
@@ -784,13 +787,12 @@ function quiz(a){
     a.querySelectorAll("#o .choice").forEach(b=>b.onclick=()=>check(b.dataset.v));
   }else{
     const inp=$("#in");
-    inp.focus();
-    inp.onkeydown=e=>{if(e.key==="Enter")$("#nx").click()};
+    if(inp){
+      inp.onkeydown=e=>{if(e.key==="Enter")$("#nx").click()};
+      setTimeout(refocus,200);
+    }
     $("#nx").onclick=()=>{
-      if($("#nx").textContent==="Valider")check(inp.value);
-    };
-    $("#nx").onclick=()=>{
-      if(!answered){const v=inp.value;if(!v.trim())return;check(v)}
+      if(!answered){const v=inp?inp.value:"";if(!v.trim()){toast("Écris le nombre");return}check(v)}
       else{advance()}
     };
   }
@@ -933,6 +935,15 @@ setInterval(()=>{if(!S.profile)return;const t=today();
   S.history[t]=S.history[t]||{xp:0,m:0};S.history[t].m=(S.history[t].m||0)+1/6;S.minutes+=1/6;save()},10000);
 
 if("serviceWorker" in navigator)navigator.serviceWorker.register("sw.js").catch(()=>{});
+window.addEventListener("error",function(e){
+  try{
+    var d=document.getElementById("errbox")||document.createElement("div");
+    d.id="errbox";
+    d.style.cssText="position:fixed;left:8px;right:8px;top:8px;z-index:99999;background:#7f1d1d;color:#fff;padding:12px;border-radius:14px;font:12px/1.4 monospace;white-space:pre-wrap";
+    d.textContent="ERREUR APPLI\n"+(e.message||e.error||"inconnue")+"\n"+(e.filename||"")+":"+(e.lineno||"");
+    document.body.appendChild(d);
+  }catch(_){}
+},true);
 render();
 </script>
 </body>
