@@ -425,7 +425,26 @@ CM2:[
    {h:"Multiplier",p:"On pose la multiplication et on additionne les résultats partiels."},
    {h:"Astuce",p:"Pour ×9 : multiplie par 10 puis enlève le nombre. 7×9 = 70−7 = 63."},
    {h:"Priorités",p:"D'abord les parenthèses, puis × et ÷, enfin + et −."}],
-  gen(){const a=rnd(12,29),b=rnd(3,9);return{q:`${a} × ${b}`,a:String(a*b)}}},
+  gen(){
+    if(Math.random()<0.6){
+      const a=rnd(1,10),b=rnd(1,10);
+      return {q:`${a} × ${b}`,a:String(a*b)};
+    }
+    const a=rnd(10,60),b=rnd(2,29);
+    return Math.random()<0.5
+      ? {q:`${a} + ${b}`,a:String(a+b)}
+      : {q:`${a} − ${b}`,a:String(a-b)};
+  }},
+ {id:"cm2_tables",t:"Tables de 1 à 10",lecon:[
+   {h:"Le principe",p:"Multiplier, c'est additionner plusieurs fois le même nombre. 7 × 3 = 7 + 7 + 7 = 21."},
+   {h:"Table de 10",p:"Il suffit d'ajouter un zéro : 6 × 10 = 60. C'est la plus facile, sers-t'en comme repère."},
+   {h:"Table de 5",p:"Le résultat finit toujours par 0 ou 5 : 5, 10, 15, 20, 25, 30, 35, 40, 45, 50."},
+   {h:"Table de 9",p:"Multiplie par 10 puis enlève le nombre : 9 × 7 = 70 − 7 = 63."},
+   {h:"Table de 2 et 4",p:"× 2 c'est doubler. × 4 c'est doubler deux fois : 4 × 6 = 12 puis 24."}],
+  gen(){
+    const a=rnd(1,10),b=rnd(1,10);
+    return {q:`${a} × ${b}`,a:String(a*b)};
+  }},
  {id:"cm2_frac",t:"Fractions",lecon:[
    {h:"Même dénominateur",p:"On additionne les numérateurs, le dénominateur ne change pas."},
    {h:"Formule",p:"a/d + b/d = (a+b)/d"}],
