@@ -267,17 +267,62 @@ const today=()=>new Date().toISOString().slice(0,10);
 function num(v){const s=String(v).replace(/\s/g,"").replace(",",".").replace(/^\+/,"");const n=parseFloat(s);return isNaN(n)?null:n}
 
 
+let AUDIO_OK=false;
+const FEMALE_FR=/audrey|am[eé]lie|amelia|marie|julie|c[eé]line|chantal|virginie|flo|aurelie|google/i;
+const MALE_FR=/thomas|daniel|nicolas|guillaume|paul|henri/i;
+
+function unlockAudio(){
+  if(AUDIO_OK)return;AUDIO_OK=true;
+  try{
+    const AC=window.AudioContext||window.webkitAudioContext;
+    if(AC){
+      const ctx=new AC();
+      if(ctx.resume)ctx.resume();
+      const o=ctx.createOscillator(),g=ctx.createGain();
+      g.gain.value=0.0001;o.connect(g);g.connect(ctx.destination);
+      o.start();o.stop(ctx.currentTime+0.06);
+    }
+  }catch(e){}
+  try{
+    const a=new Audio("data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAgD4AAAB9AAACABAAZGF0YQAAAAA=");
+    a.volume=0.01;a.play().catch(()=>{});
+  }catch(e){}
+}
+window.addEventListener("pointerdown",unlockAudio,{once:true});
+
+function frVoice(){
+  if(!window.speechSynthesis)return null;
+  const vs=speechSynthesis.getVoices().filter(v=>/^fr/i.test(v.lang||""));
+  if(!vs.length)return null;
+  const female=vs.find(v=>FEMALE_FR.test(v.name||""));
+  if(female)return female;
+  const notMale=vs.find(v=>!MALE_FR.test(v.name||""));
+  return notMale||vs[0];
+}
 function speak(text,rate){
   try{
     if(!window.speechSynthesis)return;
-    speechSynthesis.cancel();
-    const u=new SpeechSynthesisUtterance(String(text));
-    u.lang="fr-FR";u.rate=rate||0.85;
-    const v=speechSynthesis.getVoices().find(x=>/fr(-|_)/i.test(x.lang));
-    if(v)u.voice=v;
-    speechSynthesis.speak(u);
+    const go=()=>{
+      speechSynthesis.cancel();
+      const u=new SpeechSynthesisUtterance(String(text));
+      u.lang="fr-FR";
+      u.rate=rate||0.85;
+      u.pitch=1.05;
+      u.volume=1;
+      const v=frVoice();
+      if(v)u.voice=v;
+      speechSynthesis.speak(u);
+    };
+    if(speechSynthesis.getVoices().length===0){
+      setTimeout(go,180);
+    } else { go(); }
   }catch(e){}
 }
+if(window.speechSynthesis){
+  speechSynthesis.onvoiceschanged=()=>{ speechSynthesis.getVoices(); };
+  speechSynthesis.getVoices();
+}
+
 function frNum(n){
   const u=["zéro","un","deux","trois","quatre","cinq","six","sept","huit","neuf","dix","onze","douze","treize","quatorze","quinze","seize","dix-sept","dix-huit","dix-neuf"];
   const t=["","","vingt","trente","quarante","cinquante","soixante"];
@@ -669,9 +714,10 @@ function quiz(a){
       ${q.speak
         ? `<div class="tiny muted" style="text-align:center;letter-spacing:.08em;text-transform:uppercase;font-weight:800">Dictée</div>
            <div class="biglisten">🔊</div>
-           <div class="row" style="justify-content:center;gap:8px">
-             <button class="pill" id="sp">Réécouter</button>
+           <div class="row" style="justify-content:center;gap:8px;flex-wrap:wrap">
+             <button class="pill" id="sp">🔊 Réécouter</button>
              <button class="pill" id="sl">🐢 Lent</button>
+             <button class="pill" id="sv">🎚️ Tester la voix</button>
            </div>`
         : `<div class="bigq" style="white-space:pre-line">${esc(q.q)}</div>`}
       ${q.unit?`<div class="tiny muted" style="margin-top:6px">réponse en ${esc(q.unit)}</div>`:""}
@@ -699,10 +745,11 @@ function quiz(a){
     if(fd)fd.parentElement.insertBefore(fb,fd);
   };
   if(q.speak){
-    const sp=$("#sp"), sl=$("#sl");
-    if(sp)sp.onclick=()=>speak(q.speak,.85);
-    if(sl)sl.onclick=()=>speak(q.speak,.5);
-    if(!Q.spoken){Q.spoken=true;setTimeout(()=>speak(q.speak,.85),350)}
+    const sp=$("#sp"), sl=$("#sl"), sv=$("#sv");
+    if(sp)sp.onclick=()=>{unlockAudio();speak(q.speak,.85)};
+    if(sl)sl.onclick=()=>{unlockAudio();speak(q.speak,.5)};
+    if(sv)sv.onclick=()=>{unlockAudio();speak("Voici la voix de la dictée. Cent vingt-sept mille un",.8)};
+    if(!Q.spoken){Q.spoken=true;setTimeout(()=>{if(AUDIO_OK)speak(q.speak,.85)},450)}
   }
   if(opts){
     a.querySelectorAll("#o .choice").forEach(b=>b.onclick=()=>check(b.dataset.v));
