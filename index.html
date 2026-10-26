@@ -251,7 +251,9 @@ background:linear-gradient(180deg,#86ec3a,#55c400);box-shadow:0 8px 20px rgba(85
 .pose{display:grid;gap:5px;margin:16px auto 0;max-width:330px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
 .pose .dig{display:grid;place-items:center;font-size:24px;font-weight:700;height:34px}
 .pose .op{display:grid;place-items:center;font-size:22px;font-weight:800;color:#8fd4ff}
-.pose .carry{display:grid;place-items:center;font-size:12px;font-weight:800;color:#ffb64d;height:18px}
+.pose .carry{width:100%;height:26px;text-align:center;font-size:13px;font-weight:800;color:#ffb64d;
+border-radius:8px;border:1px dashed rgba(255,182,77,.5);background:rgba(255,182,77,.07);padding:0}
+.pose .carry:focus{outline:none;border-style:solid;border-color:#ffb64d;box-shadow:0 0 0 2px rgba(255,182,77,.18)}
 .pose .line{grid-column:1/-1;height:2px;background:rgba(255,255,255,.35);margin:2px 0;border-radius:2px}
 .pose .rdig{width:100%;height:40px;text-align:center;font-size:22px;font-weight:800;padding:0;
 border-radius:10px;border:1.5px solid rgba(255,255,255,.18);background:rgba(0,0,0,.35);color:#fff}
@@ -527,7 +529,7 @@ function poseHTML(p){
   const ra=pad(p.a), rb=pad(p.b);
   let h=`<div class="pose" style="grid-template-columns:${cols}">`;
   h+=`<div></div>`;
-  for(let i=0;i<n;i++) h+=`<div class="carry" id="c${i}"></div>`;
+  for(let i=0;i<n;i++) h+=`<input class="carry" id="c${i}" inputmode="numeric" maxlength="1" autocomplete="off">`;
   h+=`<div></div>`;
   for(let i=0;i<n;i++) h+=`<div class="dig">${ra[i].trim()}</div>`;
   h+=`<div class="op">${p.op}</div>`;
@@ -1043,7 +1045,7 @@ function quiz(a){
       }
       poseCarries(q.pose).forEach((c,i)=>{
         const e=document.getElementById("c"+i);
-        if(e&&c) e.textContent=c;
+        if(e&&c&&!e.value) e.value=c;
       });
     }
     const fd=document.querySelector(".feed");
@@ -1091,6 +1093,7 @@ function quiz(a){
   }else if(q.pose){
     const n=poseN(q.pose);
     const first=$("#r"+(n-1));
+    const car0=document.getElementById("c"+(n-2)); if(car0)car0.setAttribute("placeholder","");
     if(first) setTimeout(()=>{try{first.focus()}catch(e){}},200);
     $("#nx").onclick=()=>{
       if(!answered){
@@ -1202,7 +1205,7 @@ function profile(a){
     <input id="fi" type="file" accept="application/json" style="display:none">
     <div style="height:10px"></div>
     <button class="btn alt" id="rst" style="color:#ff9a9a">♻️ Réinitialiser</button></div>
-  <p class="tiny muted" style="text-align:center;margin-top:16px">v13 · 26/10 22:24 · données sur ton téléphone</p>`;
+  <p class="tiny muted" style="text-align:center;margin-top:16px">v14 · 26/10 22:26 · données sur ton téléphone</p>`;
   a.querySelectorAll("[data-l]").forEach(b=>b.onclick=()=>{p.level=b.dataset.l;save();toast("Niveau : "+LEVELS[b.dataset.l].n);render()});
   $("#ren").onclick=()=>{const v=prompt("Ton prénom",p.name);if(v&&v.trim()){p.name=v.trim().slice(0,18);save();render()}};
   $("#sy").onclick=()=>{const v=$("#tk").value.trim();if(v&&v.indexOf("•")!==0)localStorage.setItem(TOKKEY,v);ghSync()};
