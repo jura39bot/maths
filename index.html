@@ -230,12 +230,12 @@ hr{border:0;border-top:1px solid rgba(255,255,255,.10);margin:16px 0}
 .fb.no b{color:#ff6b6b}
 .fb.ok b{color:#9dff6b}
 
-.places{display:flex;gap:6px;justify-content:center;margin-top:12px;flex-wrap:wrap}
-.place{min-width:52px;padding:8px 6px;border-radius:12px;text-align:center;
+.places{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px;margin-top:12px;width:100%}
+.place{min-width:0;padding:7px 1px;border-radius:10px;text-align:center;
 background:linear-gradient(160deg,rgba(255,255,255,.12),rgba(255,255,255,.04));
 border:1px solid rgba(255,255,255,.16)}
-.place b{display:block;font-size:21px;line-height:1.1}
-.place span{display:block;font-size:8px;color:#93a4bf;text-transform:uppercase;letter-spacing:.03em;line-height:1.25;margin-top:5px}
+.place b{display:block;font-size:17px;line-height:1.1}
+.place span{display:block;font-size:7px;color:#93a4bf;text-transform:uppercase;letter-spacing:0;line-height:1.2;margin-top:4px}
 .place.hi{border-color:rgba(120,230,60,.55);background:rgba(90,209,0,.14)}
 .biglisten{font-size:46px;text-align:center;margin:6px 0}
 
@@ -997,7 +997,7 @@ function profile(a){
     <input id="fi" type="file" accept="application/json" style="display:none">
     <div style="height:10px"></div>
     <button class="btn alt" id="rst" style="color:#ff9a9a">♻️ Réinitialiser</button></div>
-  <p class="tiny muted" style="text-align:center;margin-top:16px">v6 · 26/10 22:07 · données sur ton téléphone</p>`;
+  <p class="tiny muted" style="text-align:center;margin-top:16px">v7 · 26/10 22:09 · données sur ton téléphone</p>`;
   a.querySelectorAll("[data-l]").forEach(b=>b.onclick=()=>{p.level=b.dataset.l;save();toast("Niveau : "+LEVELS[b.dataset.l].n);render()});
   $("#ren").onclick=()=>{const v=prompt("Ton prénom",p.name);if(v&&v.trim()){p.name=v.trim().slice(0,18);save();render()}};
   $("#sy").onclick=()=>{const v=$("#tk").value.trim();if(v&&v.indexOf("•")!==0)localStorage.setItem(TOKKEY,v);ghSync()};
