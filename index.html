@@ -238,7 +238,10 @@ border:1px solid rgba(255,255,255,.16)}
 .place span{display:block;font-size:8px;color:#93a4bf;text-transform:uppercase;letter-spacing:.03em;line-height:1.25;margin-top:5px}
 .place.hi{border-color:rgba(120,230,60,.55);background:rgba(90,209,0,.14)}
 .biglisten{font-size:46px;text-align:center;margin:6px 0}
-</style>
+
+.feed .entry{width:100%;margin-bottom:10px}
+.feed input[type=text]{font-size:22px;padding:14px;text-align:center;width:100%}
+
 </head>
 <body>
 <div id="app"></div>
@@ -731,9 +734,11 @@ function quiz(a){
         : `<div class="bigq" style="white-space:pre-line">${esc(q.q)}</div>`}
       ${q.unit?`<div class="tiny muted" style="margin-top:6px">réponse en ${esc(q.unit)}</div>`:""}
     </div>
-    ${opts?`<div id="o">${opts.map((x,i)=>`<button class="choice" data-v="${esc(x)}"><span class="k">${"ABCD"[i]}</span>${esc(x)}</button>`).join("")}</div>`
-      :`<div class="spacer"></div><input id="in" type="text" inputmode="decimal" placeholder="ta réponse" autocomplete="off">`}
-    <div class="feed"><div><button class="btn" id="nx" ${opts?"disabled":""}>${opts?"Répondre":"Valider"}</button></div></div>`;
+    ${opts?`<div id="o">${opts.map((x,i)=>`<button class="choice" data-v="${esc(x)}"><span class="k">${"ABCD"[i]}</span>${esc(x)}</button>`).join("")}</div>`:""}
+    <div class="feed"><div>
+      ${opts?"":`<div class="entry"><input id="in" type="text" inputmode="numeric" placeholder="le nombre entendu" autocomplete="off" autocorrect="off" spellcheck="false"></div>`}
+      <button class="btn" id="nx" ${opts?"disabled":""}>${opts?"Répondre":"Valider"}</button>
+    </div></div>`;
   let answered=false;
   const check=(val)=>{
     if(answered)return;answered=true;
@@ -753,13 +758,27 @@ function quiz(a){
     const fd=document.querySelector(".feed");
     if(fd)fd.parentElement.insertBefore(fb,fd);
   };
+  const field=$("#in");
+  const refocus=()=>{ if(field){ try{field.focus({preventScroll:true})}catch(e){field.focus()} } };
   if(q.speak){
     const sp=$("#sp"), sl=$("#sl"), sv=$("#sv");
-    const play=(r)=>{unlockAudio(); if(q.audio)playClip(q.audio,r||1); else speak(q.speak,r||.85)};
+    [sp,sl,sv].forEach(b=>{ if(b) b.addEventListener("pointerdown",ev=>ev.preventDefault()); });
+    const play=(r)=>{
+      unlockAudio();
+      if(q.audio){ playClip(q.audio,r||1); if(CLIP)CLIP.onended=()=>setTimeout(refocus,60); }
+      else speak(q.speak,r||.85);
+      setTimeout(refocus,150);
+      setTimeout(refocus,1200);
+    };
     if(sp)sp.onclick=()=>play(1);
     if(sl)sl.onclick=()=>play(0.65);
-    if(sv)sv.onclick=()=>{unlockAudio(); if(NUMDICT.length)playClip("audio/"+NUMDICT[0].f)};
-    if(!Q.spoken){ Q.spoken=true; setTimeout(()=>{ if(q.audio)playClip(q.audio); else if(AUDIO_OK)speak(q.speak,.85); },400); }
+    if(sv)sv.onclick=()=>{unlockAudio(); if(NUMDICT.length)playClip("audio/"+NUMDICT[0].f); setTimeout(refocus,150)};
+    if(!Q.spoken){
+      Q.spoken=true;
+      setTimeout(()=>{ if(q.audio){playClip(q.audio); if(CLIP)CLIP.onended=()=>setTimeout(refocus,60);} else if(AUDIO_OK)speak(q.speak,.85); },400);
+    }
+    setTimeout(refocus,150);
+    setTimeout(refocus,1400);
   }
   if(opts){
     a.querySelectorAll("#o .choice").forEach(b=>b.onclick=()=>check(b.dataset.v));
