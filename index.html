@@ -258,6 +258,19 @@ border-radius:10px;border:1.5px solid rgba(255,255,255,.18);background:rgba(0,0,
 .pose .rdig:focus{outline:none;border-color:#5ad100;box-shadow:0 0 0 2px rgba(90,209,0,.25)}
 .pose .rdig.ok{border-color:#58cc02;color:#b6ff87}
 .pose .rdig.no{border-color:#ff4b4b;color:#ffb3b3}
+
+.demo{display:grid;gap:5px;margin:14px auto 0;max-width:330px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
+.demo .dig{display:grid;place-items:center;font-size:24px;font-weight:700;height:34px;border-radius:8px}
+.demo .dig.hi{background:rgba(90,209,0,.18)}
+.demo .op{display:grid;place-items:center;font-size:22px;font-weight:800;color:#8fd4ff}
+.demo .carry{display:grid;place-items:center;font-size:12px;font-weight:800;color:#ffb64d;height:18px}
+.demo .line{grid-column:1/-1;height:2px;background:rgba(255,255,255,.35);margin:2px 0;border-radius:2px}
+.demo .res{display:grid;place-items:center;height:40px;font-size:24px;font-weight:800;color:#b6ff87;
+border-radius:10px;border:1.5px solid rgba(90,209,0,.45);background:rgba(90,209,0,.10)}
+.demo .res.hi{border-color:#58cc02;background:rgba(90,209,0,.28)}
+.demo .empty{border-color:rgba(255,255,255,.12);background:rgba(0,0,0,.25);color:transparent}
+.demo .say{min-height:64px;margin-top:14px;font-size:15px;line-height:1.5;color:#dfe8f6}
+.demo .say b{color:#9fe870}
 </style>
 </head>
 <body>
@@ -408,6 +421,91 @@ function frNum(n){
   if(k)parts.push(k===1?"mille":b1000(k)+" mille");
   if(r)parts.push(b1000(r));
   return parts.join(" ");
+}
+const DEMOS=[
+ {t:"Addition : 845 + 327", a:"845", b:"327", op:"+", res:"1172", steps:[
+   {txt:"On aligne les nombres : unités sous unités, dizaines sous dizaines, centaines sous centaines.", hi:3},
+   {txt:"Unités : 5 + 7 = 12. J'écris 2, et je retiens 1 au-dessus des dizaines.", hi:3, carry:{2:"1"}, res:{3:"2"}},
+   {txt:"Dizaines : 4 + 2 + 1 de retenue = 7. J'écris 7, rien à retenir.", hi:2, carry:{2:"1"}, res:{3:"2",2:"7"}},
+   {txt:"Centaines : 8 + 3 = 11. J'écris 11 : le 1 des dizaines passe dans la colonne des milliers.", hi:1, carry:{2:"1"}, res:{3:"2",2:"7",1:"1",0:"1"}},
+   {txt:"Résultat : 845 + 327 = 1 172.", hi:-1, carry:{2:"1"}, res:{3:"2",2:"7",1:"1",0:"1"}}
+ ]},
+ {t:"Soustraction : 734 − 258", a:"734", b:"258", op:"−", res:"476", steps:[
+   {txt:"On aligne les nombres comme pour l'addition.", hi:3},
+   {txt:"Unités : 4 − 8, impossible. J'emprunte une dizaine : 14 − 8 = 6. Je note la retenue au-dessus du 3.", hi:3, carry:{2:"1"}, res:{3:"6"}},
+   {txt:"Dizaines : 3 − 1 = 2. 2 − 5, impossible : j'emprunte aux centaines. 12 − 5 = 7.", hi:2, carry:{2:"1",1:"1"}, res:{3:"6",2:"7"}},
+   {txt:"Centaines : 7 − 1 = 6. 6 − 2 = 4.", hi:1, carry:{2:"1",1:"1"}, res:{3:"6",2:"7",1:"4"}},
+   {txt:"Résultat : 734 − 258 = 476. Vérification : 476 + 258 = 734. C'est juste.", hi:-1, carry:{2:"1",1:"1"}, res:{3:"6",2:"7",1:"4",0:""}}
+ ]}
+];
+let DEMO={i:0,step:0,timer:null,playing:false};
+function demoStop(){ if(DEMO.timer){clearInterval(DEMO.timer);DEMO.timer=null} DEMO.playing=false; }
+function demoTick(){
+  if(!DEMO.playing)return;
+  const d=DEMOS[DEMO.i];
+  if(DEMO.step>=d.steps.length-1){demoStop();return}
+  DEMO.step++;
+  render();
+  const st=d.steps[DEMO.step];
+  try{speak(st.txt)}catch(e){}
+}
+function demoGrid(d,step){
+  const n=Math.max(d.a.length,d.b.length)+1;
+  const pad=s=>s.padStart(n," ").split("");
+  const ra=pad(d.a), rb=pad(d.b);
+  const resAll=String(d.res).padStart(n," ").split("");
+  const st=d.steps[step]||{};
+  const carry=st.carry||{}, res=st.res||{};
+  const cols=`20px repeat(${n},minmax(0,1fr))`;
+  let h=`<div class="demo" style="grid-template-columns:${cols}">`;
+  h+=`<div></div>`;
+  for(let i=0;i<n;i++) h+=`<div class="carry">${carry[i]||""}</div>`;
+  h+=`<div></div>`;
+  for(let i=0;i<n;i++) h+=`<div class="dig${st.hi===i?" hi":""}">${ra[i].trim()}</div>`;
+  h+=`<div class="op">${d.op}</div>`;
+  for(let i=0;i<n;i++) h+=`<div class="dig${st.hi===i?" hi":""}">${rb[i].trim()}</div>`;
+  h+=`<div class="line"></div>`;
+  h+=`<div></div>`;
+  for(let i=0;i<n;i++){
+    const v=res[i]!==undefined?res[i]:"";
+    const known=res[i]!==undefined&&res[i]!=="";
+    h+=`<div class="res ${known?"":"empty"}${st.hi===i?" hi":""}">${known?res[i]:resAll[i].trim()}</div>`;
+  }
+  h+=`</div>`;
+  return h;
+}
+function demoScreen(a){
+  const d=DEMOS[DEMO.i];
+  const st=d.steps[DEMO.step];
+  a.innerHTML=`<div class="top"><button class="back" onclick="demoStop();go('lesson')">‹</button><h2>Exemple animé</h2><span style="width:40px"></span></div>
+    <div class="tabs">
+      <button class="tab ${DEMO.i===0?"on":""}" data-d="0">Addition</button>
+      <button class="tab ${DEMO.i===1?"on":""}" data-d="1">Soustraction</button>
+    </div>
+    <div class="cardq">
+      <div class="between"><b>${d.t}</b><span class="tiny muted">${DEMO.step+1}/${d.steps.length}</span></div>
+      ${demoGrid(d,DEMO.step)}
+      <div class="say">${st.txt}</div>
+    </div>
+    <div class="spacer"></div>
+    <div class="grid3">
+      <button class="btn alt" id="prev">◀︎</button>
+      <button class="btn" id="play">${DEMO.playing?"⏸ Pause":"▶︎ Lire"}</button>
+      <button class="btn alt" id="next">▶︎</button>
+    </div>
+    <div style="height:10px"></div>
+    <button class="btn alt" id="restart">🔄 Recommencer</button>`;
+  a.querySelectorAll("[data-d]").forEach(b=>b.onclick=()=>{demoStop();DEMO.i=+b.dataset.d;DEMO.step=0;render()});
+  $("#prev").onclick=()=>{demoStop();if(DEMO.step>0)DEMO.step--;render()};
+  $("#next").onclick=()=>{demoStop();if(DEMO.step<d.steps.length-1)DEMO.step++;render()};
+  $("#restart").onclick=()=>{demoStop();DEMO.step=0;render()};
+  $("#play").onclick=()=>{
+    if(DEMO.playing){demoStop();render();return}
+    if(DEMO.step>=d.steps.length-1)DEMO.step=0;
+    DEMO.playing=true;render();
+    speak(d.steps[DEMO.step].txt);
+    DEMO.timer=setInterval(demoTick,5200);
+  };
 }
 function poseHTML(p){
   const n=Math.max(p.a.length,p.b.length)+1;
@@ -740,6 +838,7 @@ function render(){
     case "stats":return stats(a);
     case "profile":return profile(a);
     case "lesson":return lesson(a);
+    case "demo":return demoScreen(a);
   }
   home(a);
 }
@@ -851,9 +950,13 @@ function lesson(a){
   a.innerHTML=`<div class="top"><button class="back" onclick="go('chapter')">‹</button><h2>${esc(c.t)}</h2><span style="width:38px"></span></div>
   <div class="stack">${c.lecon.map(l=>`<div class="card"><h3>${esc(l.h)}</h3><p style="margin-top:6px">${esc(l.p)}</p></div>`).join("")}</div>
   <div class="spacer"></div>
+  <button class="btn blue" id="demo">▶︎ Voir un exemple animé</button>
+  <div style="height:10px"></div>
   <button class="btn" id="ex">S'entraîner — 8 exercices</button>
   <div style="height:10px"></div>
   <button class="btn alt" id="bk">Retour</button>`;
+  const db=$("#demo");
+  if(db)db.onclick=()=>{DEMO.step=0;DEMO.i=(c.id==="cm2_pose")?0:0;go("demo")};
   $("#ex").onclick=()=>startQuiz(c.id);
   $("#bk").onclick=()=>go("chapter");
 }
@@ -1086,7 +1189,7 @@ function profile(a){
     <input id="fi" type="file" accept="application/json" style="display:none">
     <div style="height:10px"></div>
     <button class="btn alt" id="rst" style="color:#ff9a9a">♻️ Réinitialiser</button></div>
-  <p class="tiny muted" style="text-align:center;margin-top:16px">v10 · 26/10 22:16 · données sur ton téléphone</p>`;
+  <p class="tiny muted" style="text-align:center;margin-top:16px">v11 · 26/10 22:19 · données sur ton téléphone</p>`;
   a.querySelectorAll("[data-l]").forEach(b=>b.onclick=()=>{p.level=b.dataset.l;save();toast("Niveau : "+LEVELS[b.dataset.l].n);render()});
   $("#ren").onclick=()=>{const v=prompt("Ton prénom",p.name);if(v&&v.trim()){p.name=v.trim().slice(0,18);save();render()}};
   $("#sy").onclick=()=>{const v=$("#tk").value.trim();if(v&&v.indexOf("•")!==0)localStorage.setItem(TOKKEY,v);ghSync()};
