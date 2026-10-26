@@ -247,6 +247,17 @@ background:linear-gradient(180deg,#86ec3a,#55c400);box-shadow:0 8px 20px rgba(85
 .okbtn:active{transform:scale(.985)}
 .feed input[type=text]{font-size:22px;padding:14px;text-align:center;width:100%}
 
+
+.pose{display:grid;gap:5px;margin:16px auto 0;max-width:330px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
+.pose .dig{display:grid;place-items:center;font-size:24px;font-weight:700;height:34px}
+.pose .op{display:grid;place-items:center;font-size:22px;font-weight:800;color:#8fd4ff}
+.pose .carry{display:grid;place-items:center;font-size:12px;font-weight:800;color:#ffb64d;height:18px}
+.pose .line{grid-column:1/-1;height:2px;background:rgba(255,255,255,.35);margin:2px 0;border-radius:2px}
+.pose .rdig{width:100%;height:40px;text-align:center;font-size:22px;font-weight:800;padding:0;
+border-radius:10px;border:1.5px solid rgba(255,255,255,.18);background:rgba(0,0,0,.35);color:#fff}
+.pose .rdig:focus{outline:none;border-color:#5ad100;box-shadow:0 0 0 2px rgba(90,209,0,.25)}
+.pose .rdig.ok{border-color:#58cc02;color:#b6ff87}
+.pose .rdig.no{border-color:#ff4b4b;color:#ffb3b3}
 </style>
 </head>
 <body>
@@ -398,6 +409,43 @@ function frNum(n){
   if(r)parts.push(b1000(r));
   return parts.join(" ");
 }
+function poseHTML(p){
+  const n=Math.max(p.a.length,p.b.length)+1;
+  const cols=`20px repeat(${n},minmax(0,1fr))`;
+  const pad=s=>s.padStart(n," ").split("");
+  const ra=pad(p.a), rb=pad(p.b);
+  let h=`<div class="pose" style="grid-template-columns:${cols}">`;
+  h+=`<div></div>`;
+  for(let i=0;i<n;i++) h+=`<div class="carry" id="c${i}"></div>`;
+  h+=`<div></div>`;
+  for(let i=0;i<n;i++) h+=`<div class="dig">${ra[i].trim()}</div>`;
+  h+=`<div class="op">${p.op}</div>`;
+  for(let i=0;i<n;i++) h+=`<div class="dig">${rb[i].trim()}</div>`;
+  h+=`<div class="line"></div>`;
+  h+=`<div></div>`;
+  for(let i=0;i<n;i++) h+=`<input class="rdig" id="r${i}" inputmode="numeric" maxlength="1" autocomplete="off">`;
+  h+=`</div>`;
+  return h;
+}
+function poseCarries(p){
+  const n=Math.max(p.a.length,p.b.length)+1;
+  const A=p.a.padStart(n,"0").split("").map(Number);
+  const B=p.b.padStart(n,"0").split("").map(Number);
+  const out=new Array(n).fill("");
+  if(p.op==="+"){
+    let c=0;
+    for(let i=n-1;i>=0;i--){ const t=A[i]+B[i]+c; c=t>=10?1:0; if(c&&i-1>=0) out[i-1]="1"; }
+  } else {
+    let bor=0;
+    for(let i=n-1;i>=0;i--){ let top=A[i]-bor; if(top<B[i]){ top+=10; bor=1; if(i-1>=0) out[i-1]="1"; } else bor=0; }
+  }
+  return out;
+}
+function poseRead(n){
+  let out="";
+  for(let i=0;i<n;i++){ const e=document.getElementById("r"+i); if(e) out+=(e.value||""); }
+  return out.replace(/[^0-9]/g,"");
+}
 function convPanel(th,to,answer,fam){
   fam=fam||"m";
   const T={
@@ -471,6 +519,19 @@ CM2:[
     return Math.random()<0.5
       ? {q:`${a} + ${b}`,a:String(a+b)}
       : {q:`${a} − ${b}`,a:String(a-b)};
+  }},
+ {id:"cm2_pose",t:"Opérations posées",lecon:[
+   {h:"Aligner les colonnes",p:"On écrit les nombres l'un sous l'autre : unités sous unités, dizaines sous dizaines, centaines sous centaines."},
+   {h:"Addition",p:"On additionne colonne par colonne en partant de la droite. Si le total dépasse 9, on écrit le chiffre des unités et on retient 1 au-dessus de la colonne suivante."},
+   {h:"Soustraction",p:"Si le chiffre du haut est plus petit que celui du bas, on emprunte une dizaine à gauche. On note la retenue au-dessus."},
+   {h:"Comment répondre",p:"Écris les chiffres du résultat dans les cases du bas, en partant de la droite. Les cases au-dessus sont les retenues."}],
+  gen(){
+    const op=Math.random()<0.5?"+":"−";
+    let a,b;
+    if(op==="+"){ a=rnd(120,9999); b=rnd(120,9999); }
+    else { a=rnd(500,9999); b=rnd(100,a-1); }
+    const res=op==="+"?a+b:a-b;
+    return {q:`${a} ${op} ${b}`,a:String(res),pose:{a:String(a),b:String(b),op}};
   }},
  {id:"cm2_tables",t:"Tables de 1 à 10",lecon:[
    {h:"Le principe",p:"Multiplier, c'est additionner plusieurs fois le même nombre. 7 × 3 = 7 + 7 + 7 = 21."},
@@ -832,12 +893,13 @@ function quiz(a){
         : `<div class="bigq" style="white-space:pre-line">${esc(q.q)}</div>`}
       ${q.unit?`<div class="tiny muted" style="margin-top:6px">réponse en ${esc(q.unit)}</div>`:""}
     </div>
+    ${q.pose?poseHTML(q.pose):""}
     ${opts?`<div id="o">${opts.map((x,i)=>`<button class="choice" data-v="${esc(x)}"><span class="k">${"ABCD"[i]}</span>${esc(x)}</button>`).join("")}</div>`
-      :`<div class="entry">
+      :(q.pose?"":`<div class="entry">
           <input id="in" type="text" inputmode="${q.speak?"numeric":"decimal"}" enterkeyhint="done" placeholder="${q.speak?"le nombre entendu":"ta réponse"}" autocomplete="off" autocorrect="off" spellcheck="false">
           <button class="okbtn" id="ok2">Valider ✓</button>
         </div>
-        ${q.speak?`<p class="tiny muted" style="text-align:center;margin-top:8px">écoute puis écris le nombre en chiffres</p>`:""}`}
+        ${q.speak?`<p class="tiny muted" style="text-align:center;margin-top:8px">écoute puis écris le nombre en chiffres</p>`:""}`)}
     <div class="feed"><div><button class="btn" id="nx" ${opts?"disabled":""}>${opts?"Répondre":"Valider"}</button></div></div>`;
   let answered=false;
   const check=(val)=>{
@@ -856,6 +918,18 @@ function quiz(a){
     const rep=esc(q.a)+(q.unit?" "+q.unit:"");
     fb.innerHTML=ok?("✓ Juste — <b>"+rep+"</b>"+panel)
                    :((q.speak?"✗ Faux. Le nombre était <b>":"✗ Faux. La bonne réponse est <b>")+rep+"</b>"+panel);
+    if(q.pose){
+      const n=Math.max(q.pose.a.length,q.pose.b.length)+1;
+      const ans=String(q.a).padStart(n," ").split("");
+      for(let i=0;i<n;i++){
+        const e=document.getElementById("r"+i);
+        if(e){ if(!e.value) e.value=ans[i].trim(); e.classList.add(ok?"ok":"no"); }
+      }
+      poseCarries(q.pose).forEach((c,i)=>{
+        const e=document.getElementById("c"+i);
+        if(e&&c) e.textContent=c;
+      });
+    }
     const fd=document.querySelector(".feed");
     if(fd)fd.parentElement.insertBefore(fb,fd);
   };
@@ -898,6 +972,17 @@ function quiz(a){
   }
   if(opts){
     a.querySelectorAll("#o .choice").forEach(b=>b.onclick=()=>check(b.dataset.v));
+  }else if(q.pose){
+    const n=Math.max(q.pose.a.length,q.pose.b.length)+1;
+    const first=$("#r"+(n-1));
+    if(first) setTimeout(()=>{try{first.focus()}catch(e){}},200);
+    $("#nx").onclick=()=>{
+      if(!answered){
+        const v=poseRead(n);
+        if(!v){toast("Écris le résultat");return}
+        check(v);
+      } else advance();
+    };
   }else{
     const inp=$("#in");
     if(inp){
@@ -1001,7 +1086,7 @@ function profile(a){
     <input id="fi" type="file" accept="application/json" style="display:none">
     <div style="height:10px"></div>
     <button class="btn alt" id="rst" style="color:#ff9a9a">♻️ Réinitialiser</button></div>
-  <p class="tiny muted" style="text-align:center;margin-top:16px">v9 · 26/10 22:14 · données sur ton téléphone</p>`;
+  <p class="tiny muted" style="text-align:center;margin-top:16px">v10 · 26/10 22:16 · données sur ton téléphone</p>`;
   a.querySelectorAll("[data-l]").forEach(b=>b.onclick=()=>{p.level=b.dataset.l;save();toast("Niveau : "+LEVELS[b.dataset.l].n);render()});
   $("#ren").onclick=()=>{const v=prompt("Ton prénom",p.name);if(v&&v.trim()){p.name=v.trim().slice(0,18);save();render()}};
   $("#sy").onclick=()=>{const v=$("#tk").value.trim();if(v&&v.indexOf("•")!==0)localStorage.setItem(TOKKEY,v);ghSync()};
