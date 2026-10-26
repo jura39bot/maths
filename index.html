@@ -468,9 +468,11 @@ CM2:[
    if(Math.random()<.5)return{q:`Périmètre d'un rectangle de ${L} cm sur ${l} cm`,a:String(2*(L+l)),unit:"cm"};
    return{q:`Aire d'un rectangle de ${L} cm sur ${l} cm`,a:String(L*l),unit:"cm²"}}},
  {id:"cm2_conv",t:"Conversions",lecon:[
-   {h:"Longueurs",p:"1 m = 100 cm · 1 km = 1000 m"},
-   {h:"Masses",p:"1 kg = 1000 g"},
-   {h:"Capacités",p:"1 L = 1000 mL"}],
+   {h:"Tableau des longueurs",p:"km · hm · dam · m · dm · cm · mm — chaque colonne vaut 10 fois celle de droite."},
+   {h:"Le décalage",p:"m → cm : 2 colonnes vers la droite, donc × 100. m → mm : 3 colonnes, donc × 1 000."},
+   {h:"Exemple",p:"4,2 m = 42 dm = 420 cm = 4 200 mm. On ajoute un zéro par colonne franchie."},
+   {h:"Masses",p:"1 kg = 1 000 g · 1 g = 1 000 mg"},
+   {h:"Capacités",p:"1 L = 1 000 mL · 1 L = 1 dm³"}],
   gen(){const v=pick([1.5,2.5,3.5,4.2,6.8]);const to=pick(["cm","mm"]);
    const f=to==="cm"?100:1000;
    return{q:`${v} m = ? ${to}`,a:String(Math.round(v*f)),unit:to}}}
