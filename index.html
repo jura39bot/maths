@@ -238,6 +238,7 @@ border:1px solid rgba(255,255,255,.16)}
 .place span{display:block;font-size:7px;color:#93a4bf;text-transform:uppercase;letter-spacing:0;line-height:1.2;margin-top:4px}
 .place.hi{border-color:rgba(120,230,60,.55);background:rgba(90,209,0,.14)}
 .biglisten{font-size:46px;text-align:center;margin:6px 0}
+.legend{font-size:9px;line-height:1.5;color:#8fa1bd;text-align:center;margin-top:8px}
 
 .entry{margin-top:16px}
 .entry input{width:100%;font-size:24px;padding:16px;text-align:center;letter-spacing:2px}
@@ -430,6 +431,7 @@ function convPanel(mm,to,answer){
   const srcTxt=String(mm/1000).replace(".",",");
 
   return `<div class="places">${cells}</div>
+    <div class="legend">km kilomètre · hm hectomètre · dam décamètre · m mètre · dm décimètre · cm centimètre · mm millimètre</div>
     <div class="tiny muted" style="text-align:center;margin-top:8px">${srcTxt} m → on remplit jusqu'à <b>${to}</b> : ${answer} ${to}<br>chaque colonne franchie = ×10</div>`;
 }
 
@@ -504,7 +506,7 @@ CM2:[
    if(Math.random()<.5)return{q:`Périmètre d'un rectangle de ${L} cm sur ${l} cm`,a:String(2*(L+l)),unit:"cm"};
    return{q:`Aire d'un rectangle de ${L} cm sur ${l} cm`,a:String(L*l),unit:"cm²"}}},
  {id:"cm2_conv",t:"Conversions",lecon:[
-   {h:"Tableau des longueurs",p:"km · hm · dam · m · dm · cm · mm — chaque colonne vaut 10 fois celle de droite."},
+   {h:"Tableau des longueurs",p:"km kilomètre · hm hectomètre · dam décamètre · m mètre · dm décimètre · cm centimètre · mm millimètre. Chaque colonne vaut 10 fois celle de droite."},
    {h:"Le décalage",p:"m → cm : 2 colonnes vers la droite, donc × 100. m → mm : 3 colonnes, donc × 1 000."},
    {h:"Exemple",p:"4,2 m = 42 dm = 420 cm = 4 200 mm. On ajoute un zéro par colonne franchie."},
    {h:"Masses",p:"1 kg = 1 000 g · 1 g = 1 000 mg"},
@@ -997,7 +999,7 @@ function profile(a){
     <input id="fi" type="file" accept="application/json" style="display:none">
     <div style="height:10px"></div>
     <button class="btn alt" id="rst" style="color:#ff9a9a">♻️ Réinitialiser</button></div>
-  <p class="tiny muted" style="text-align:center;margin-top:16px">v7 · 26/10 22:09 · données sur ton téléphone</p>`;
+  <p class="tiny muted" style="text-align:center;margin-top:16px">v8 · 26/10 22:12 · données sur ton téléphone</p>`;
   a.querySelectorAll("[data-l]").forEach(b=>b.onclick=()=>{p.level=b.dataset.l;save();toast("Niveau : "+LEVELS[b.dataset.l].n);render()});
   $("#ren").onclick=()=>{const v=prompt("Ton prénom",p.name);if(v&&v.trim()){p.name=v.trim().slice(0,18);save();render()}};
   $("#sy").onclick=()=>{const v=$("#tk").value.trim();if(v&&v.indexOf("•")!==0)localStorage.setItem(TOKKEY,v);ghSync()};
