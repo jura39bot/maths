@@ -397,26 +397,42 @@ function frNum(n){
   if(r)parts.push(b1000(r));
   return parts.join(" ");
 }
-function convPanel(mm,to){
+function convPanel(mm,to,answer){
   const cols=[
-    {k:"km",f:1e6},{k:"hm",f:1e5},{k:"dam",f:1e4},{k:"m",f:1e3},
-    {k:"dm",f:1e2},{k:"cm",f:1e1},{k:"mm",f:1e0}
+    {k:"km",i:0},{k:"hm",i:1},{k:"dam",i:2},{k:"m",i:3},
+    {k:"dm",i:4},{k:"cm",i:5},{k:"mm",i:6}
   ];
-  const digits=String(Math.round(mm));
-  const used={};
-  // on place les chiffres de droite à gauche, en partant des mm
-  for(let i=0;i<digits.length;i++){
-    const idx=cols.length-1-i;
-    if(idx>=0) used[cols[idx].k]=digits[digits.length-1-i];
+  const startIdx=3; // colonne des mètres
+  const targetIdx={m:3,dm:4,cm:5,mm:6}[to]!==undefined?{m:3,dm:4,cm:5,mm:6}[to]:6;
+
+  // valeur de départ en mm, écrite à sa place (virgule dans la colonne des m)
+  const srcDigits=String(Math.round(mm));
+  const src={};
+  for(let i=0;i<srcDigits.length;i++){
+    const idx=startIdx-i;
+    if(idx>=0) src[cols[idx].k]=srcDigits[srcDigits.length-1-i];
   }
+
+  // réponse, alignée à droite sur la colonne visée
+  const ansDigits=String(answer);
+  const ans={};
+  for(let i=0;i<ansDigits.length;i++){
+    const idx=targetIdx-i;
+    if(idx>=0) ans[cols[idx].k]=ansDigits[ansDigits.length-1-i];
+  }
+
   const cells=cols.map(c=>{
-    const d=used[c.k];
-    const hi=c.k===to?" hi":"";
-    return `<div class="place${hi}"><b>${d!==undefined?d:"·"}</b><span>${c.k}</span></div>`;
+    const d=ans[c.k]!==undefined?ans[c.k]:"·";
+    const hi=ans[c.k]!==undefined?" hi":"";
+    return `<div class="place${hi}"><b>${d}</b><span>${c.k}</span></div>`;
   }).join("");
+
+  const srcTxt=String(mm/1000).replace(".",",");
+
   return `<div class="places">${cells}</div>
-    <div class="tiny muted" style="text-align:center;margin-top:8px">1 colonne = ×10 · la colonne visée est encadrée en vert</div>`;
+    <div class="tiny muted" style="text-align:center;margin-top:8px">${srcTxt} m → on remplit jusqu'à <b>${to}</b> : ${answer} ${to}<br>chaque colonne franchie = ×10</div>`;
 }
+
 function placesPanel(numStr){
   const labels=["unités","dizaines","centaines","milliers","dizaines de milliers","centaines de milliers","millions","dizaines de millions"];
   const digits=String(numStr).split("");
@@ -832,7 +848,7 @@ function quiz(a){
     $("#nx").disabled=false;
     const fb=document.createElement("div");
     fb.className="fb "+(ok?"ok":"no");
-    const panel=q.places?placesPanel(q.a):(q.conv?convPanel(q.conv.mm,q.conv.to):"");
+    const panel=q.places?placesPanel(q.a):(q.conv?convPanel(q.conv.mm,q.conv.to,q.a):"");
     const rep=esc(q.a)+(q.unit?" "+q.unit:"");
     fb.innerHTML=ok?("✓ Juste — <b>"+rep+"</b>"+panel)
                    :((q.speak?"✗ Faux. Le nombre était <b>":"✗ Faux. La bonne réponse est <b>")+rep+"</b>"+panel);
@@ -981,7 +997,7 @@ function profile(a){
     <input id="fi" type="file" accept="application/json" style="display:none">
     <div style="height:10px"></div>
     <button class="btn alt" id="rst" style="color:#ff9a9a">♻️ Réinitialiser</button></div>
-  <p class="tiny muted" style="text-align:center;margin-top:16px">v5 · 26/10 22:02 · données sur ton téléphone</p>`;
+  <p class="tiny muted" style="text-align:center;margin-top:16px">v6 · 26/10 22:07 · données sur ton téléphone</p>`;
   a.querySelectorAll("[data-l]").forEach(b=>b.onclick=()=>{p.level=b.dataset.l;save();toast("Niveau : "+LEVELS[b.dataset.l].n);render()});
   $("#ren").onclick=()=>{const v=prompt("Ton prénom",p.name);if(v&&v.trim()){p.name=v.trim().slice(0,18);save();render()}};
   $("#sy").onclick=()=>{const v=$("#tk").value.trim();if(v&&v.indexOf("•")!==0)localStorage.setItem(TOKKEY,v);ghSync()};
