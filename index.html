@@ -788,10 +788,10 @@ function quiz(a){
     </div>
     ${opts?`<div id="o">${opts.map((x,i)=>`<button class="choice" data-v="${esc(x)}"><span class="k">${"ABCD"[i]}</span>${esc(x)}</button>`).join("")}</div>`
       :`<div class="entry">
-          <input id="in" type="text" inputmode="numeric" enterkeyhint="done" placeholder="le nombre entendu" autocomplete="off" autocorrect="off" spellcheck="false">
+          <input id="in" type="text" inputmode="${q.speak?"numeric":"decimal"}" enterkeyhint="done" placeholder="${q.speak?"le nombre entendu":"ta réponse"}" autocomplete="off" autocorrect="off" spellcheck="false">
           <button class="okbtn" id="ok2">Valider ✓</button>
         </div>
-        <p class="tiny muted" style="text-align:center;margin-top:8px">écoute puis écris le nombre en chiffres</p>`}
+        ${q.speak?`<p class="tiny muted" style="text-align:center;margin-top:8px">écoute puis écris le nombre en chiffres</p>`:""}`}
     <div class="feed"><div><button class="btn" id="nx" ${opts?"disabled":""}>${opts?"Répondre":"Valider"}</button></div></div>`;
   let answered=false;
   const check=(val)=>{
@@ -807,8 +807,9 @@ function quiz(a){
     const fb=document.createElement("div");
     fb.className="fb "+(ok?"ok":"no");
     const panel=q.places?placesPanel(q.a):"";
-    fb.innerHTML=ok?("✓ Juste — <b>"+esc(q.a)+(q.unit?" "+q.unit:"")+"</b>"+panel)
-                   :("✗ Faux. Le nombre était <b>"+esc(q.a)+(q.unit?" "+q.unit:"")+"</b>"+panel);
+    const rep=esc(q.a)+(q.unit?" "+q.unit:"");
+    fb.innerHTML=ok?("✓ Juste — <b>"+rep+"</b>"+panel)
+                   :((q.speak?"✗ Faux. Le nombre était <b>":"✗ Faux. La bonne réponse est <b>")+rep+"</b>"+panel);
     const fd=document.querySelector(".feed");
     if(fd)fd.parentElement.insertBefore(fb,fd);
   };
