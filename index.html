@@ -397,6 +397,26 @@ function frNum(n){
   if(r)parts.push(b1000(r));
   return parts.join(" ");
 }
+function convPanel(mm,to){
+  const cols=[
+    {k:"km",f:1e6},{k:"hm",f:1e5},{k:"dam",f:1e4},{k:"m",f:1e3},
+    {k:"dm",f:1e2},{k:"cm",f:1e1},{k:"mm",f:1e0}
+  ];
+  const digits=String(Math.round(mm));
+  const used={};
+  // on place les chiffres de droite à gauche, en partant des mm
+  for(let i=0;i<digits.length;i++){
+    const idx=cols.length-1-i;
+    if(idx>=0) used[cols[idx].k]=digits[digits.length-1-i];
+  }
+  const cells=cols.map(c=>{
+    const d=used[c.k];
+    const hi=c.k===to?" hi":"";
+    return `<div class="place${hi}"><b>${d!==undefined?d:"·"}</b><span>${c.k}</span></div>`;
+  }).join("");
+  return `<div class="places">${cells}</div>
+    <div class="tiny muted" style="text-align:center;margin-top:8px">1 colonne = ×10 · la colonne visée est encadrée en vert</div>`;
+}
 function placesPanel(numStr){
   const labels=["unités","dizaines","centaines","milliers","dizaines de milliers","centaines de milliers","millions","dizaines de millions"];
   const digits=String(numStr).split("");
@@ -473,9 +493,13 @@ CM2:[
    {h:"Exemple",p:"4,2 m = 42 dm = 420 cm = 4 200 mm. On ajoute un zéro par colonne franchie."},
    {h:"Masses",p:"1 kg = 1 000 g · 1 g = 1 000 mg"},
    {h:"Capacités",p:"1 L = 1 000 mL · 1 L = 1 dm³"}],
-  gen(){const v=pick([1.5,2.5,3.5,4.2,6.8]);const to=pick(["cm","mm"]);
-   const f=to==="cm"?100:1000;
-   return{q:`${v} m = ? ${to}`,a:String(Math.round(v*f)),unit:to}}}
+  gen(){
+    const mm=pick([1500,2500,3500,4200,6800,1200,3400,7500]);
+    const to=pick(["cm","mm"]);
+    const v=mm/1000;
+    const shown=String(v).replace(".",",");
+    return {q:`${shown} m = ? ${to}`,a:String(to==="cm"?mm/10:mm),unit:to,conv:{mm,to}};
+  }}
 ],
 "6E":[
  {id:"6e_frac",t:"Simplifier une fraction",lecon:[
@@ -808,7 +832,7 @@ function quiz(a){
     $("#nx").disabled=false;
     const fb=document.createElement("div");
     fb.className="fb "+(ok?"ok":"no");
-    const panel=q.places?placesPanel(q.a):"";
+    const panel=q.places?placesPanel(q.a):(q.conv?convPanel(q.conv.mm,q.conv.to):"");
     const rep=esc(q.a)+(q.unit?" "+q.unit:"");
     fb.innerHTML=ok?("✓ Juste — <b>"+rep+"</b>"+panel)
                    :((q.speak?"✗ Faux. Le nombre était <b>":"✗ Faux. La bonne réponse est <b>")+rep+"</b>"+panel);
@@ -957,7 +981,7 @@ function profile(a){
     <input id="fi" type="file" accept="application/json" style="display:none">
     <div style="height:10px"></div>
     <button class="btn alt" id="rst" style="color:#ff9a9a">♻️ Réinitialiser</button></div>
-  <p class="tiny muted" style="text-align:center;margin-top:16px">v4 · 26/10 21:58 · données sur ton téléphone</p>`;
+  <p class="tiny muted" style="text-align:center;margin-top:16px">v5 · 26/10 22:02 · données sur ton téléphone</p>`;
   a.querySelectorAll("[data-l]").forEach(b=>b.onclick=()=>{p.level=b.dataset.l;save();toast("Niveau : "+LEVELS[b.dataset.l].n);render()});
   $("#ren").onclick=()=>{const v=prompt("Ton prénom",p.name);if(v&&v.trim()){p.name=v.trim().slice(0,18);save();render()}};
   $("#sy").onclick=()=>{const v=$("#tk").value.trim();if(v&&v.indexOf("•")!==0)localStorage.setItem(TOKKEY,v);ghSync()};
