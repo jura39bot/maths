@@ -457,6 +457,56 @@ function demoTick(){
   const st=d.steps[DEMO.step];
   demoSay(DEMO.i,DEMO.step,st.txt);
 }
+let GTIMER=null;
+function demoStopGeneric(){ if(GTIMER){clearInterval(GTIMER);GTIMER=null} S._gp=false; stopAudio(); }
+function demoGeneric(a, ch){
+  const steps = (ch.lecon||[]).map(l=>({h:l.h, p:l.p}));
+  try{
+    const q = ch.gen();
+    steps.push({h:"Exemple", p:`${q.q}  →  ${q.a}${q.unit?" "+q.unit:""}`});
+  }catch(e){}
+  if(!steps.length) steps.push({h:"Leçon", p:ch.t});
+  const i = Math.min(S._gi||0, steps.length-1);
+  const st = steps[i];
+  const pct = Math.round(100*(i+1)/steps.length);
+  a.innerHTML=`<div class="top"><button class="back" onclick="demoStopGeneric();go('lesson')">‹</button><h2>${esc(ch.t)}</h2><span style="width:40px"></span></div>
+    <div class="between" style="margin-bottom:8px"><span class="pill">Étape ${i+1} / ${steps.length}</span><span class="tiny muted">exemple animé</span></div>
+    <div class="bar" style="margin-bottom:14px"><i style="width:${pct}%"></i></div>
+    <div class="cardq">
+      <h3 style="color:#8fd4ff">${esc(st.h)}</h3>
+      <p style="margin-top:10px;font-size:17px;line-height:1.6">${esc(st.p)}</p>
+    </div>
+    <div class="spacer"></div>
+    <button class="btn alt" id="gsay">🔊 Réécouter</button>
+    <div style="height:10px"></div>
+    <div class="grid3">
+      <button class="btn alt" id="gprev">◀︎</button>
+      <button class="btn" id="gplay">${S._gp?"⏸ Pause":"▶︎ Lire"}</button>
+      <button class="btn alt" id="gnext">▶︎</button>
+    </div>
+    <div style="height:10px"></div>
+    <button class="btn alt" id="grestart">🔄 Recommencer</button>`;
+  const say=()=>{ try{ speak(st.h+". "+st.p); }catch(e){} };
+  $("#gsay").onclick=say;
+  $("#gprev").onclick=()=>{demoStopGeneric(); if(i>0)S._gi=i-1; render()};
+  $("#gnext").onclick=()=>{demoStopGeneric(); if(i<steps.length-1)S._gi=i+1; render()};
+  $("#grestart").onclick=()=>{demoStopGeneric(); S._gi=0; render()};
+  $("#gplay").onclick=()=>{
+    if(S._gp){demoStopGeneric();render();return}
+    S._gp=true; render();
+    let k=i;
+    const tick=()=>{
+      const cur=steps[k];
+      try{ speak(cur.h+". "+cur.p); }catch(e){}
+      k++;
+      if(k>=steps.length){ setTimeout(()=>{demoStopGeneric();render()},5200); return }
+      setTimeout(()=>{ S._gi=k; render(); },5200);
+    };
+    tick();
+  };
+  setTimeout(say,300);
+}
+
 function demoClip(i,step){ return "audio/demo/"+(i===0?"a":"s")+step+".mp3"; }
 function demoSay(i,step,txt){
   const id=++DEMO_SEQ;
@@ -539,6 +589,8 @@ function coursNext(){
 }
 function coursStop(){ S._csp=false; try{speechSynthesis.cancel()}catch(e){} }
 function demoScreen(a){
+  const ch=(typeof chapterById==="function")?chapterById(S._ch):null;
+  if(ch && ch.id!=="cm2_pose") return demoGeneric(a,ch);
   const d=DEMOS[DEMO.i];
   const st=d.steps[DEMO.step];
   a.innerHTML=`<div class="top"><button class="back" onclick="demoStop();go('lesson')">‹</button><h2>Exemple animé</h2><span style="width:40px"></span></div>
