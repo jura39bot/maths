@@ -344,7 +344,9 @@ function actx(){
     return ACTX;
   }catch(e){return null;}
 }
-async function playClipWA(src,rate,onend){
+let CUR_SRC=null, DEMO_SEQ=0;
+function stopAudio(){ try{ if(CUR_SRC){ CUR_SRC.onended=null; CUR_SRC.stop(); } }catch(e){} CUR_SRC=null; try{ if(window.speechSynthesis) speechSynthesis.cancel(); }catch(e){} }
+async function playClipWA(src,rate,onend,guard){
   const c=actx();
   if(!c) return false;
   try{
@@ -355,12 +357,15 @@ async function playClipWA(src,rate,onend){
       b=await c.decodeAudioData(ab);
       ABUF[src]=b;
     }
+    if(guard && !guard()) return true;
+    stopAudio();
     const s=c.createBufferSource();
     s.buffer=b;
     s.playbackRate.value=rate||1;
     const g=c.createGain(); g.gain.value=1;
     s.connect(g); g.connect(c.destination);
-    s.onended=()=>{ if(onend)onend(); };
+    s.onended=()=>{ if(CUR_SRC===s) CUR_SRC=null; if(onend)onend(); };
+    CUR_SRC=s;
     s.start();
     return true;
   }catch(e){ return false; }
@@ -442,7 +447,7 @@ const DEMOS=[
  ]}
 ];
 let DEMO={i:0,step:0,timer:null,playing:false};
-function demoStop(){ if(DEMO.timer){clearInterval(DEMO.timer);DEMO.timer=null} DEMO.playing=false; }
+function demoStop(){ DEMO_SEQ++; if(DEMO.timer){clearInterval(DEMO.timer);DEMO.timer=null} DEMO.playing=false; stopAudio(); }
 function demoTick(){
   if(!DEMO.playing)return;
   const d=DEMOS[DEMO.i];
@@ -454,8 +459,12 @@ function demoTick(){
 }
 function demoClip(i,step){ return "audio/demo/"+(i===0?"a":"s")+step+".mp3"; }
 function demoSay(i,step,txt){
+  const id=++DEMO_SEQ;
   try{ unlockAudio(); }catch(e){}
-  playClipWA(demoClip(i,step),1,()=>{}).then(ok=>{ if(!ok){ try{speak(txt)}catch(e){} } });
+  playClipWA(demoClip(i,step),1,()=>{},()=>id===DEMO_SEQ).then(ok=>{
+    if(id!==DEMO_SEQ) return;
+    if(!ok){ try{speak(txt)}catch(e){} }
+  });
 }
 function demoGrid(d,step){
   const n=Math.max(d.a.length,d.b.length)+1;
