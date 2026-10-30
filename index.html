@@ -956,10 +956,10 @@ function home(a){
   </div>
   <div class="spacer"></div>
   <div class="card row" style="gap:16px">
-    <div class="ring" style="--p:${pct}"><span>${xp}/${GOAL_XP}</span></div>
+    <div class="ring" style="--p:${pct}"><span>${Math.min(xp,GOAL_XP)}/${GOAL_XP}</span></div>
     <div style="flex:1"><b>Objectif du jour</b>
       <p class="small muted" style="margin-top:2px">${xp>=GOAL_XP?"Objectif atteint 🎉":"Encore "+(GOAL_XP-xp)+" XP"}</p>
-      <p class="tiny muted">${Math.round(h.m||0)} min aujourd'hui · ${Math.round(S.minutes)} min au total</p></div>
+      <p class="tiny muted">${Math.round(h.m||0)} min aujourd'hui · ${Math.round(S.minutes)} min au total · ⭐ ${S.xp} XP cumulés</p></div>
   </div>
   <div class="spacer"></div>
   <button class="btn" id="go">▶️ Continuer</button>
@@ -1192,8 +1192,7 @@ function quiz(a){
 function endQuiz(){
   const mins=Math.max(1,Math.round((Date.now()-Q.start)/60000));
   const acc=Math.round(100*Q.ok/(Q.n||1));
-  S.minutes+=mins;S.history[today()]=S.history[today()]||{xp:0,m:0};
-  S.history[today()].m=(S.history[today()].m||0)+mins;save();
+  save();
   const ok=Q.ok,n=Q.n,t=Q.c.t;
   Q=null;
   const a=$("#app");
@@ -1313,8 +1312,17 @@ async function ghSync(){
 }
 
 /* ---------- minute clock ---------- */
-setInterval(()=>{if(!S.profile)return;const t=today();
-  S.history[t]=S.history[t]||{xp:0,m:0};S.history[t].m=(S.history[t].m||0)+1/6;S.minutes+=1/6;save()},10000);
+setInterval(()=>{
+  if(!S.profile)return;
+  if(document.visibilityState!=="visible")return;
+  const scr=S._s||"home";
+  if(!["quiz","lesson","demo","cours"].includes(scr))return;
+  const t=today();
+  S.history[t]=S.history[t]||{xp:0,m:0};
+  S.history[t].m=(S.history[t].m||0)+1/6;
+  S.minutes+=1/6;
+  save();
+},10000);
 
 if("serviceWorker" in navigator)navigator.serviceWorker.register("sw.js",{updateViaCache:"none"}).catch(()=>{});
 window.addEventListener("error",function(e){
